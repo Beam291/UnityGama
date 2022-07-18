@@ -10,8 +10,6 @@ public class NetworkCoordinate : MonoBehaviour
 {
 	public string gridCoordinate = "";
 
-	
-
 	#region private members 	
 	private TcpClient socketConnection;
 	private Thread clientReceiveThread;
@@ -69,7 +67,7 @@ public class NetworkCoordinate : MonoBehaviour
 						// Convert byte array to string message. 						
 						string serverMes = Encoding.ASCII.GetString(incommingData);
 						gridCoordinate = serverMes;
-						
+						Debug.Log(serverMes);
 					}
 				}
 			}

@@ -82,8 +82,8 @@ public class GenerateCube : MonoBehaviour
                 //assgin position to cube
                 cube.transform.position = new Vector3(
                     subFloatList[0],
-                    subFloatList[2],
-                    subFloatList[1]);
+                    subFloatList[1],
+                    subFloatList[2]);
 
                 cube.transform.parent = GameObject.Find("ListOfGrid").transform;
                 cube.name = "cube" + i;
