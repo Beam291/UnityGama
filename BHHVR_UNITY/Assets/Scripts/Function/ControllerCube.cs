@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class ControllerCube : MonoBehaviour
 {
+    #region private member
     private int nb_cube;
 
     private GenerateCube generateCube;
-    string cubeName;
+    #endregion
+
+    #region internal member
+    internal string cubeName;
+    internal string colorCube;
+    #endregion
 
     // Start is called before the first frame update
     void Start()
@@ -28,11 +34,11 @@ public class ControllerCube : MonoBehaviour
                 if(hitInfo.transform != null)
                 {
                     cubeName = hitInfo.transform.gameObject.name;
+                    colorCube = "red"; 
                     Debug.Log(hitInfo.transform.gameObject.transform.position);
                 }
             }
         }
-        
     }
 
     private void GetListOfCube()

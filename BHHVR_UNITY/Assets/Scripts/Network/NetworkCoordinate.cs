@@ -8,28 +8,48 @@ using UnityEngine;
 
 public class NetworkCoordinate : MonoBehaviour
 {
-	public string gridCoordinate = "";
+    #region public member
+    public string gridCoordinate = "";
+    #endregion
 
-	#region private members 	
+    #region private members 
 	private TcpClient socketConnection;
 	private Thread clientReceiveThread;
+	
 	private const int PORT = 8052;
+
+	private ControllerCube controllerCube
+    {
+		get;
+		set;
+    }
 	#endregion
 
 	// Use this for initialization 	
 	void Start()
 	{
 		ConnectToTcpServer();
+		controllerReference();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		SendMessage();
-		List<string> test = new List<string>();
-		test.Add(gridCoordinate);
-		Debug.Log(test.Count);
+		if (Input.GetKeyDown(KeyCode.E))
+        {
+			Debug.Log("Test");
+			StartMessage();
+		} 
+		if (Input.GetKeyDown(KeyCode.Space))
+        {
+			ColorMessage();
+        }
 	}
+
+	private void controllerReference()
+    {
+		controllerCube = GameObject.Find("ControllerCube").GetComponent<ControllerCube>();
+    }
 
 	// Setup socket connection. 		
 	private void ConnectToTcpServer()
@@ -67,7 +87,6 @@ public class NetworkCoordinate : MonoBehaviour
 						// Convert byte array to string message. 						
 						string serverMes = Encoding.ASCII.GetString(incommingData);
 						gridCoordinate = serverMes;
-						Debug.Log(serverMes);
 					}
 				}
 			}
@@ -78,23 +97,8 @@ public class NetworkCoordinate : MonoBehaviour
 		}
 	}
 
-	//split the data
-	private void splitMes(string mes)
-	{
-		int start = mes.IndexOf('[');
-		int end = mes.IndexOf("]");
-
-		mes = mes.Substring(start + 1, end - 1);
-
-		mes = mes.TrimStart('{');
-		mes = mes.TrimEnd('}');
-		string pattern = "}, {";
-		string[] result = Regex.Split(mes, pattern);
-
-	}
-
 	// Send message to server using socket connection. 	
-	private void SendMessage()
+	private void StartMessage()
 	{
 		if (socketConnection == null)
 		{
@@ -107,6 +111,34 @@ public class NetworkCoordinate : MonoBehaviour
 			if (stream.CanWrite)
 			{
 				string clientMessage = "Start" + "\n\r\n";
+				// Convert string message to byte array.                 
+				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
+				// Write byte array to socketConnection stream.                 
+				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
+
+				//Debug.Log("Client sent his message - should be received by server");
+			}
+			//stream.Close();
+		}
+		catch (SocketException socketException)
+		{
+			Debug.Log("Socket exception: " + socketException);
+		}
+	}
+	
+	private void ColorMessage()
+	{
+		if (socketConnection == null)
+		{
+			return;
+		}
+		try
+		{
+			// Get a stream object for writing. 			
+			NetworkStream stream = socketConnection.GetStream();
+			if (stream.CanWrite)
+			{
+				string clientMessage = controllerCube.colorCube + "\n\r\n";
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 
