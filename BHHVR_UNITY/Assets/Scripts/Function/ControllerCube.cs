@@ -12,6 +12,9 @@ public class ControllerCube : MonoBehaviour
 
     #region internal member
     internal string cubeName;
+    internal string cubeX;
+    internal string cubeY;
+    internal string cubeZ;
     internal string colorCube;
     #endregion
 
@@ -34,8 +37,13 @@ public class ControllerCube : MonoBehaviour
                 if(hitInfo.transform != null)
                 {
                     cubeName = hitInfo.transform.gameObject.name;
-                    colorCube = "red"; 
-                    Debug.Log(hitInfo.transform.gameObject.transform.position);
+                    colorCube = "blue"; 
+                    float x = hitInfo.transform.gameObject.transform.position.x;
+                    cubeX = x.ToString("0.00");
+                    float y = hitInfo.transform.gameObject.transform.position.y;
+                    cubeY = y.ToString("0.00");
+                    float z = hitInfo.transform.gameObject.transform.position.z;
+                    cubeZ = z.ToString("0.00");
                 }
             }
         }

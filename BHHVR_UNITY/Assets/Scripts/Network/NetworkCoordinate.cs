@@ -138,7 +138,10 @@ public class NetworkCoordinate : MonoBehaviour
 			NetworkStream stream = socketConnection.GetStream();
 			if (stream.CanWrite)
 			{
-				string clientMessage = controllerCube.colorCube + "\n\r\n";
+				string clientMessage = '{'+controllerCube.cubeX + ","
+					+ controllerCube.cubeY + ","
+					+ controllerCube.cubeZ +'}' + '|'+ controllerCube.colorCube + "\n\r\n";
+					//+ controllerCube.colorCube + "\n\r\n";
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 

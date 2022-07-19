@@ -16,12 +16,11 @@ global{
 	
 	string type <- "server";
 	
-	string unityMessage <- "";
+	string unityMessage;
 	
-	point test <- "{6.25,31.25,0.0}";
+	list<string> selectedCell <- ["0", "0"];
+	
 	int cycle;
-	
-	string test_c <- "blue";
 		
 	init{
 		loop i from: 0 to: 7{
@@ -30,38 +29,37 @@ global{
 			}
 		}
 		
-//		write test_c;
-//		write type_of(color);
-		
-		//create server
 		if (type = "server") {
 			do create_server;
 		}
-		
-		write grid_location[2];
 	}
 	
-	//create server
 	action create_server{
 		create Server{
 			do connect protocol: "tcp_server" port: 8052 raw: true;
 		}
 	}
 	
-	reflex colorChange when: unityMessage = "red"{
+	reflex colorChange {
+		if(unityMessage != nil){
+			selectedCell <- unityMessage split_with("|", false);
+		}
+		
+		point selectedCellCoordinate;
+		string selectedCellColor;
+		
+		if(selectedCell[0] != "Start"){
+			selectedCellCoordinate <- selectedCell[0];
+			selectedCellColor <- selectedCell[1];
+		}
+		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				if(plot[i,j].location = test){
-					write plot[i,j];
-					
-						plot[i,j].color <- unityMessage;
-						write unityMessage;
-						write plot[i,j].color;
-					
+				if(plot[i,j].location = selectedCellCoordinate){
+					plot[i,j].color <- selectedCellColor;
 				}
 			}
 		}
-		
 	}
 }
 
