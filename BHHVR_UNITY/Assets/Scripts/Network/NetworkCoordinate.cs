@@ -12,7 +12,7 @@ public class NetworkCoordinate : MonoBehaviour
     public string gridCoordinate = "";
     #endregion
 
-    #region private members 
+    #region private members
 	private TcpClient socketConnection;
 	private Thread clientReceiveThread;
 	
@@ -141,7 +141,7 @@ public class NetworkCoordinate : MonoBehaviour
 				string clientMessage = '{'+controllerCube.cubeX + ","
 					+ controllerCube.cubeY + ","
 					+ controllerCube.cubeZ +'}' + '|'+ controllerCube.colorCube + "\n\r\n";
-					//+ controllerCube.colorCube + "\n\r\n";
+					
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 

@@ -25,22 +25,22 @@ global{
 	init{
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				add plot[i,j].location to: grid_location;
+				add Plot[i,j].location to: grid_location;
 			}
 		}
 		
 		if (type = "server") {
-			do create_server;
+			do Create_server;
 		}
 	}
 	
-	action create_server{
+	action Create_server{
 		create Server{
 			do connect protocol: "tcp_server" port: 8052 raw: true;
 		}
 	}
 	
-	reflex colorChange {
+	reflex ColorChange {
 		if(unityMessage != nil){
 			selectedCell <- unityMessage split_with("|", false);
 		}
@@ -55,8 +55,8 @@ global{
 		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				if(plot[i,j].location = selectedCellCoordinate){
-					plot[i,j].color <- selectedCellColor;
+				if(Plot[i,j].location = selectedCellCoordinate){
+					Plot[i,j].color <- selectedCellColor;
 				}
 			}
 		}
@@ -65,7 +65,7 @@ global{
 
 species Server skills: [network] parallel:true{
 	//receive message when detect message send from client 
-	reflex receive when: has_more_message() {
+	reflex Receive when: has_more_message() {
 		loop while: has_more_message() {
 			message mm <- fetch_message();
 			write " received : " + mm.contents color: color;
@@ -74,19 +74,19 @@ species Server skills: [network] parallel:true{
 		}
 	}
 	
-	reflex send when: unityMessage = "Start"{
+	reflex Send when: unityMessage = "Start"{
 		do send to: client contents: grid_location;
 	}
 }
 
-grid plot width: 8 height: 8{
+grid Plot width: 8 height: 8{
 	
 }
 
-experiment run type: gui{
+experiment Run type: gui{
 	output{
 		display map{
-			grid plot border: #black;
+			grid Plot border: #black;
 		}
 	}
 }
