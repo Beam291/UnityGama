@@ -5,12 +5,15 @@ using UnityEngine;
 
 public class GenerateCube : MonoBehaviour
 {
+    #region private member
     private NetworkCoordinate networkCoordinate;
-
     private string cubeCoordinate = "";
-    internal string[] listCubeCoordinate = { };
-
     private bool isDone = false;
+    #endregion
+
+    #region internal member
+    internal string[] listCubeCoordinate = { };
+    #endregion
 
     // Start is called before the first frame update
     void Start()

@@ -8,8 +8,9 @@ using UnityEngine;
 
 public class NetworkCoordinate : MonoBehaviour
 {
-    #region public member
-    public string gridCoordinate = "";
+    #region internal member
+    internal string gridCoordinate = "";
+	internal string gridColor = "";
     #endregion
 
     #region private members
@@ -35,14 +36,22 @@ public class NetworkCoordinate : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.E))
+		//Start the program
+		if (Input.GetKeyDown(KeyCode.S))
         {
-			Debug.Log("Test");
 			StartMessage();
 		} 
+
+		//Send the color have bene selected to GAMA
 		if (Input.GetKeyDown(KeyCode.Space))
         {
-			ColorMessage();
+			SendColorMessage();
+        }
+		
+		//Get the color default from GAMA to Unity
+		if (Input.GetKeyDown(KeyCode.C))
+        {
+			ColorReceived();
         }
 	}
 
@@ -86,7 +95,13 @@ public class NetworkCoordinate : MonoBehaviour
 						Array.Copy(bytes, 0, incommingData, 0, length);
 						// Convert byte array to string message. 						
 						string serverMes = Encoding.ASCII.GetString(incommingData);
-						gridCoordinate = serverMes;
+                        if (string.IsNullOrEmpty(gridCoordinate)){
+							gridCoordinate = serverMes;
+						}
+                        else
+                        {
+							gridColor = serverMes;
+						}		
 					}
 				}
 			}
@@ -115,10 +130,7 @@ public class NetworkCoordinate : MonoBehaviour
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-
-				//Debug.Log("Client sent his message - should be received by server");
 			}
-			//stream.Close();
 		}
 		catch (SocketException socketException)
 		{
@@ -126,7 +138,7 @@ public class NetworkCoordinate : MonoBehaviour
 		}
 	}
 	
-	private void ColorMessage()
+	private void SendColorMessage()
 	{
 		if (socketConnection == null)
 		{
@@ -146,10 +158,33 @@ public class NetworkCoordinate : MonoBehaviour
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-
-				//Debug.Log("Client sent his message - should be received by server");
 			}
-			//stream.Close();
+		}
+		catch (SocketException socketException)
+		{
+			Debug.Log("Socket exception: " + socketException);
+		}
+	}
+	
+	private void ColorReceived()
+	{
+		if (socketConnection == null)
+		{
+			return;
+		}
+		try
+		{
+			// Get a stream object for writing. 			
+			NetworkStream stream = socketConnection.GetStream();
+			if (stream.CanWrite)
+			{
+				string clientMessage = "Please_Send_Color";
+				
+				// Convert string message to byte array.                 
+				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
+				// Write byte array to socketConnection stream.                 
+				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
+			}
 		}
 		catch (SocketException socketException)
 		{

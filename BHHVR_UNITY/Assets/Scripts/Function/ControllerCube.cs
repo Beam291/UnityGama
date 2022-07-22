@@ -15,7 +15,11 @@ public class ControllerCube : MonoBehaviour
     internal string cubeX;
     internal string cubeY;
     internal string cubeZ;
-    internal string colorCube;
+    internal string colorCube
+    {
+        get;
+        set;
+    }
     #endregion
 
     // Start is called before the first frame update
@@ -36,8 +40,7 @@ public class ControllerCube : MonoBehaviour
             {
                 if(hitInfo.transform != null)
                 {
-                    cubeName = hitInfo.transform.gameObject.name;
-                    colorCube = "blue"; 
+                    cubeName = hitInfo.transform.gameObject.name; 
                     float x = hitInfo.transform.gameObject.transform.position.x;
                     cubeX = x.ToString("0.00");
                     float y = hitInfo.transform.gameObject.transform.position.y;
@@ -62,7 +65,7 @@ public class ControllerCube : MonoBehaviour
         }
     }
 
-    private void onMouseDown()
+    private void OnMouseDown()
     {
         Destroy(this.gameObject);
     }

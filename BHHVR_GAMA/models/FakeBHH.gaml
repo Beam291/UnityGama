@@ -5,7 +5,6 @@
 * Tags: 
 */
 
-
 model FakeBHH
 
 global{
@@ -20,21 +19,26 @@ global{
 	
 	list<string> selectedCell <- ["0", "0"];
 	
+	list<string> cellColor;
+	
 	int cycle;
 		
 	init{
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
 				add Plot[i,j].location to: grid_location;
+				add Plot[i,j].color to: cellColor;
 			}
 		}
 		
+		write cellColor;
+		
 		if (type = "server") {
-			do Create_server;
+			do CreateServer;
 		}
 	}
 	
-	action Create_server{
+	action CreateServer{
 		create Server{
 			do connect protocol: "tcp_server" port: 8052 raw: true;
 		}
@@ -48,7 +52,7 @@ global{
 		point selectedCellCoordinate;
 		string selectedCellColor;
 		
-		if(selectedCell[0] != "Start"){
+		if(selectedCell[0] != "Start" or selectedCell[0] != "Please_Send_Color"){
 			selectedCellCoordinate <- selectedCell[0];
 			selectedCellColor <- selectedCell[1];
 		}
@@ -77,10 +81,16 @@ species Server skills: [network] parallel:true{
 	reflex Send when: unityMessage = "Start"{
 		do send to: client contents: grid_location;
 	}
+	
+	reflex Send_1 when: unityMessage = "Please_Send_Color"{
+		do send to: client contents: cellColor;
+	}
 }
 
 grid Plot width: 8 height: 8{
-	
+	init{
+		one_of(Plot).color <- #green;
+	}
 }
 
 experiment Run type: gui{
@@ -90,6 +100,3 @@ experiment Run type: gui{
 		}
 	}
 }
-
-/* Insert your model definition here */
-
