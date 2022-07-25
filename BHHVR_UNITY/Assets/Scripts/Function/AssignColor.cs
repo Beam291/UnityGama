@@ -10,6 +10,7 @@ public class AssignColor : MonoBehaviour
     private GenerateCube generateCube;
     private string cellColor = "";
     private string[] listCellColor = { };
+    private int nb_cube = 0;
     #endregion
 
     // Start is called before the first frame update
@@ -23,6 +24,7 @@ public class AssignColor : MonoBehaviour
     void Update()
     {
         ParseData();
+        CubeColor();
     }
 
     private void NetworkReference()
@@ -35,8 +37,14 @@ public class AssignColor : MonoBehaviour
         generateCube = GameObject.Find("GenerateCube").GetComponent<GenerateCube>();
     }
 
+    private void GetColor()
+    {
+        cellColor = networkCoordinate.gridColor;
+    }
+
     private void ParseData()
     {
+
         if (string.IsNullOrEmpty(cellColor))
         {
             return;
@@ -54,6 +62,13 @@ public class AssignColor : MonoBehaviour
 
     private void CubeColor()
     {
-        
+        if(listCellColor.Length == 0)
+        {
+            return;
+        }
+        else
+        {
+
+        }
     }
 }

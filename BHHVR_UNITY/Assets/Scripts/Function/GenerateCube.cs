@@ -29,7 +29,6 @@ public class GenerateCube : MonoBehaviour
         if (isDone == false && listCubeCoordinate.Length != 0)
         {
             createCube();
-            isDone = true;
         }
     }
 

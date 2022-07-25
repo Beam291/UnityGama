@@ -18,7 +18,8 @@ public class NetworkCoordinate : MonoBehaviour
 	private Thread clientReceiveThread;
 	
 	private const int PORT = 8052;
-
+	private bool coordinateHasSend = false;
+	private bool colorHasSend = false;
 	private ControllerCube controllerCube
     {
 		get;
@@ -40,20 +41,23 @@ public class NetworkCoordinate : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.S))
         {
 			StartMessage();
-		} 
+			coordinateHasSend = true;
+		}
 
-		//Send the color have bene selected to GAMA
-		if (Input.GetKeyDown(KeyCode.Space))
+        //Send the color have bene selected to GAMA
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-			SendColorMessage();
+            SendColorMessage();
         }
-		
-		//Get the color default from GAMA to Unity
-		if (Input.GetKeyDown(KeyCode.C))
+
+        //Get the color default from GAMA to Unity
+        if (Input.GetKeyDown(KeyCode.D))
         {
 			ColorReceived();
-        }
-	}
+			colorHasSend = true;
+		}
+		Debug.Log(gridColor);
+    }
 
 	private void controllerReference()
     {
@@ -94,15 +98,23 @@ public class NetworkCoordinate : MonoBehaviour
 						var incommingData = new byte[length];
 						Array.Copy(bytes, 0, incommingData, 0, length);
 						// Convert byte array to string message. 						
-						string serverMes = Encoding.ASCII.GetString(incommingData);
-                        if (string.IsNullOrEmpty(gridCoordinate)){
-							gridCoordinate = serverMes;
-						}
-                        else
+						
+						if(coordinateHasSend == true)
                         {
-							gridColor = serverMes;
-						}		
-					}
+							string serverMes = Encoding.ASCII.GetString(incommingData);
+							gridCoordinate = serverMes;
+							coordinateHasSend = false;
+							Debug.Log("test cor");
+						}
+                        else if (colorHasSend == true)
+                        {
+                            Debug.Log("test");
+                            string serverRE = Encoding.ASCII.GetString(incommingData);
+                            gridColor = serverRE;
+                            colorHasSend = false;
+                        }
+
+                    }
 				}
 			}
 		}
@@ -178,7 +190,7 @@ public class NetworkCoordinate : MonoBehaviour
 			NetworkStream stream = socketConnection.GetStream();
 			if (stream.CanWrite)
 			{
-				string clientMessage = "Please_Send_Color";
+				string clientMessage = "Please_Send_Color" + "\n\r\n";
 				
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);

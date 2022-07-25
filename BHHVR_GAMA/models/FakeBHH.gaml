@@ -52,7 +52,13 @@ global{
 		point selectedCellCoordinate;
 		string selectedCellColor;
 		
-		if(selectedCell[0] != "Start" or selectedCell[0] != "Please_Send_Color"){
+		if(selectedCell[0] = "Start"){
+			return;	
+		}
+		else if(selectedCell[0] = "Please_Send_Color"){
+			return;
+		}
+		else{
 			selectedCellCoordinate <- selectedCell[0];
 			selectedCellColor <- selectedCell[1];
 		}
@@ -78,13 +84,20 @@ species Server skills: [network] parallel:true{
 		}
 	}
 	
-	reflex Send when: unityMessage = "Start"{
-		do send to: client contents: grid_location;
+	reflex Send{
+		if(unityMessage = "Start"){
+			do send to: client contents: grid_location;
+			write "haha";
+		}
+		else if(unityMessage = "Please_Send_Color"){
+			do send to: client contents: cellColor;
+			write "test";
+		}
 	}
 	
-	reflex Send_1 when: unityMessage = "Please_Send_Color"{
-		do send to: client contents: cellColor;
-	}
+//	reflex Send when: unityMessage = "Please_Send_Color"{
+//		do send to: client contents: cellColor;
+//	}
 }
 
 grid Plot width: 8 height: 8{
