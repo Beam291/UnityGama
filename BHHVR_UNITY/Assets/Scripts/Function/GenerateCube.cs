@@ -6,7 +6,7 @@ using UnityEngine;
 public class GenerateCube : MonoBehaviour
 {
     #region private member
-    private NetworkCoordinate networkCoordinate;
+    private NetworkConnect networkConnect;
     private string cubeCoordinate = "";
     private bool isDone = false;
     #endregion
@@ -18,77 +18,67 @@ public class GenerateCube : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        NetworkReference();
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetCoordinate();
-        ParseData();
-        if (isDone == false && listCubeCoordinate.Length != 0)
-        {
-            createCube();
-        }
+        CreateCube();
     }
 
-    //get Coordinate from network
-    private void GetCoordinate()
+    //Reference the Network class
+    private void NetworkReference()
     {
-        networkCoordinate = GameObject.Find("NetworkCoordinate").GetComponent<NetworkCoordinate>();
-        cubeCoordinate = networkCoordinate.gridCoordinate;
+        networkConnect = GameObject.Find("NetworkConnect").GetComponent<NetworkConnect>();
     }
 
-    //Parse Data to use
-    private void ParseData()
+    //Create Cube
+    private void CreateCube()
     {
-        if (string.IsNullOrEmpty(cubeCoordinate))
-        {
-            return;
-        }
-        else
-        {   
-            cubeCoordinate = cubeCoordinate.TrimStart('[');
-            cubeCoordinate = cubeCoordinate.TrimStart('{');
-            cubeCoordinate = cubeCoordinate.TrimEnd();
-            cubeCoordinate = cubeCoordinate.TrimEnd(']');
-            cubeCoordinate = cubeCoordinate.TrimEnd('}');
-
-            string pattern = "}, {";
-            listCubeCoordinate = Regex.Split(cubeCoordinate, pattern);
-        }
-    }
-
-    private void createCube()
-    {
-        if (listCubeCoordinate.Length == 0)
+        if (networkConnect.listGridDetail.Length == 0)
         {
             return;
         }
         else
         {
-            for (int i = 0; i < listCubeCoordinate.Length; i++)
+            for(int i = 0; i < networkConnect.listGridDetail.Length; i++)
             {
-                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                string[] subStringList = listCubeCoordinate[i].Split(',');
+                //Handle each cell
+                string[] cellDetail = { };
+                string pattern = " ; ";
+                cellDetail = Regex.Split(networkConnect.listGridDetail[i], pattern);
 
-                List<float> listFloat = new List<float>();
-                for (int j = 0; j < subStringList.Length; j++)
+                //Get coordinate of cell
+                string cellCoordinate_string = cellDetail[0];
+                cellCoordinate_string = cellCoordinate_string.TrimStart('{'); 
+                cellCoordinate_string = cellCoordinate_string.TrimEnd('}');
+                string[] cellCoordinate_string_array = cellCoordinate_string.Split(',');
+                List<float> cellCoordinate_float_list = new List<float>();
+                for(int j = 0; j < cellCoordinate_string_array.Length; j++)
                 {
-                    float value = float.Parse(subStringList[j], CultureInfo.InvariantCulture.NumberFormat);
-                    listFloat.Add(value);
+                    float value = float.Parse(cellCoordinate_string_array[j], CultureInfo.InvariantCulture.NumberFormat);
+                    cellCoordinate_float_list.Add(value);
                 }
+                float[] cellCoordinate = cellCoordinate_float_list.ToArray();
+                
+                //Get color of cell
+                string cellColor_string = cellDetail[1];
+                Color cellColor;
+                ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
 
-                float[] subFloatList = listFloat.ToArray();
-
-                //assgin position to cube
+                //Start generate Cube
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.transform.position = new Vector3(
-                    subFloatList[0],
-                    subFloatList[1],
-                    subFloatList[2]);
-
+                    cellCoordinate[0],
+                    cellCoordinate[1],
+                    cellCoordinate[2]);
                 cube.transform.parent = GameObject.Find("ListOfGrid").transform;
                 cube.name = "cube" + i;
+
+                //Assign color to cube
+                Renderer renderer = cube.GetComponent<Renderer>();
+                renderer.material.color = cellColor;
             }
         }
     }

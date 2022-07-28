@@ -11,7 +11,7 @@ global{
 	unknown client <- nil;
 	bool once <- true;
 	
-	list<point> grid_location;
+	list<string> gridDetail;
 	
 	string type <- "server";
 	
@@ -26,12 +26,14 @@ global{
 	init{
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				add Plot[i,j].location to: grid_location;
-				add Plot[i,j].color to: cellColor;
+				string cellLocation <- Plot[i,j].location;
+				string cellColor <- Plot[i,j].color;
+				
+				add "<" + cellLocation + " ; " + cellColor +">"  to: gridDetail;
 			}
 		}
 		
-		write cellColor;
+		write gridDetail;
 		
 		if (type = "server") {
 			do CreateServer;
@@ -44,33 +46,33 @@ global{
 		}
 	}
 	
-	reflex ColorChange {
-		if(unityMessage != nil){
-			selectedCell <- unityMessage split_with("|", false);
-		}
-		
-		point selectedCellCoordinate;
-		string selectedCellColor;
-		
-		if(selectedCell[0] = "Start"){
-			return;	
-		}
-		else if(selectedCell[0] = "Please_Send_Color"){
-			return;
-		}
-		else{
-			selectedCellCoordinate <- selectedCell[0];
-			selectedCellColor <- selectedCell[1];
-		}
-		
-		loop i from: 0 to: 7{
-			loop j from: 0 to: 7{
-				if(Plot[i,j].location = selectedCellCoordinate){
-					Plot[i,j].color <- selectedCellColor;
-				}
-			}
-		}
-	}
+//	reflex ColorChange {
+//		if(unityMessage != nil){
+//			selectedCell <- unityMessage split_with("|", false);
+//		}
+//		
+//		point selectedCellCoordinate;
+//		string selectedCellColor;
+//		
+//		if(selectedCell[0] = "Start"){
+//			return;	
+//		}
+//		else if(selectedCell[0] = "Please_Send_Color"){
+//			return;
+//		}
+//		else{
+//			selectedCellCoordinate <- selectedCell[0];
+//			selectedCellColor <- selectedCell[1];
+//		}
+//		
+//		loop i from: 0 to: 7{
+//			loop j from: 0 to: 7{
+//				if(Plot[i,j].location = selectedCellCoordinate){
+//					Plot[i,j].color <- selectedCellColor;
+//				}
+//			}
+//		}
+//	}
 }
 
 species Server skills: [network] parallel:true{
@@ -85,19 +87,10 @@ species Server skills: [network] parallel:true{
 	}
 	
 	reflex Send{
-		if(unityMessage = "Start"){
-			do send to: client contents: grid_location;
-			write "haha";
-		}
-		else if(unityMessage = "Please_Send_Color"){
-			do send to: client contents: cellColor;
-			write "test";
+		if(unityMessage = "Send_Detail"){
+			do send to: client contents: gridDetail;
 		}
 	}
-	
-//	reflex Send when: unityMessage = "Please_Send_Color"{
-//		do send to: client contents: cellColor;
-//	}
 }
 
 grid Plot width: 8 height: 8{
