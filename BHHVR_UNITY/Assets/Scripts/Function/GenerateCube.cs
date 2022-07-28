@@ -70,6 +70,9 @@ public class GenerateCube : MonoBehaviour
                 cube.transform.parent = GameObject.Find("ListOfGrid").transform;
                 cube.name = "cube" + i;
 
+                //Set tag to the gameobject
+                cube.gameObject.tag = "CubeController";
+
                 //Assign color to cube
                 Renderer renderer = cube.GetComponent<Renderer>();
                 renderer.material.color = cellColor;

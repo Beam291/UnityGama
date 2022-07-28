@@ -24,19 +24,24 @@ global{
 	int cycle;
 		
 	init{
-		loop i from: 0 to: 7{
-			loop j from: 0 to: 7{
-				string cellLocation <- Plot[i,j].location;
-				string cellColor <- Plot[i,j].color;
-				
-				add "<" + cellLocation + " ; " + cellColor +">"  to: gridDetail;
-			}
-		}
-		
-		write gridDetail;
-		
 		if (type = "server") {
 			do CreateServer;
+		}
+	}
+	
+	reflex LiveGrid{
+		if(unityMessage = "Send_Detail"){
+			gridDetail <- [];
+		
+			loop i from: 0 to: 7{
+				loop j from: 0 to: 7{
+					string cellLocation <- Plot[i,j].location;
+					string cellColor <- Plot[i,j].color;
+					
+					add "<" + cellLocation + " ; " + cellColor +">"  to: gridDetail;
+				}
+			}
+			
 		}
 	}
 	
@@ -46,33 +51,31 @@ global{
 		}
 	}
 	
-//	reflex ColorChange {
-//		if(unityMessage != nil){
-//			selectedCell <- unityMessage split_with("|", false);
-//		}
-//		
-//		point selectedCellCoordinate;
-//		string selectedCellColor;
-//		
-//		if(selectedCell[0] = "Start"){
-//			return;	
-//		}
-//		else if(selectedCell[0] = "Please_Send_Color"){
-//			return;
-//		}
-//		else{
-//			selectedCellCoordinate <- selectedCell[0];
-//			selectedCellColor <- selectedCell[1];
-//		}
-//		
-//		loop i from: 0 to: 7{
-//			loop j from: 0 to: 7{
-//				if(Plot[i,j].location = selectedCellCoordinate){
-//					Plot[i,j].color <- selectedCellColor;
-//				}
-//			}
-//		}
-//	}
+	reflex ColorChange {
+		if(unityMessage = "Send_Detail"){
+			return;
+		}
+		else if(unityMessage = nil) {
+			return;
+		}
+		else{
+			selectedCell <- unityMessage split_with("|", false);
+		}
+		
+		point selectedCellCoordinate;
+		string selectedCellColor;
+		
+		selectedCellCoordinate <- selectedCell[0];
+		selectedCellColor <- selectedCell[1];
+		
+		loop i from: 0 to: 7{
+			loop j from: 0 to: 7{
+				if(Plot[i,j].location = selectedCellCoordinate){
+					Plot[i,j].color <- selectedCellColor;
+				}
+			}
+		}
+	}
 }
 
 species Server skills: [network] parallel:true{

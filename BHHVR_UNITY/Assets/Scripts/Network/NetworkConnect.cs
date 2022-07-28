@@ -31,25 +31,20 @@ public class NetworkConnect : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-        //Start the program
+        //Get the coordinate of the grid and color of it.
         if (Input.GetKeyDown(KeyCode.F))
         {
             DetailMessage();
         }
 
+		//Prase the Data which gets from the GAMA
 		PraseData();
 
-        //Send the color have bene selected to GAMA
+        //Send the color have been selected to GAMA
         if (Input.GetKeyDown(KeyCode.Space))
         {
             SendColorMessage();
         }
-
-        //Get the color default from GAMA to Unity
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-			ColorReceived();
-		}
 	}
 
 	private void controllerReference()
@@ -122,7 +117,7 @@ public class NetworkConnect : MonoBehaviour
 		}
 	}
 
-	// Send message to server using socket connection. 	
+	// Send detail of the gama grid to unity. 	
 	private void DetailMessage()
 	{
 		if (socketConnection == null)
@@ -148,6 +143,7 @@ public class NetworkConnect : MonoBehaviour
 		}
 	}
 	
+	// Send the cube information which wants to change color
 	private void SendColorMessage()
 	{
 		if (socketConnection == null)
@@ -164,32 +160,6 @@ public class NetworkConnect : MonoBehaviour
 					+ controllerCube.cubeY + ","
 					+ controllerCube.cubeZ +'}' + '|'+ controllerCube.colorCube + "\n\r\n";
 					
-				// Convert string message to byte array.                 
-				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
-				// Write byte array to socketConnection stream.                 
-				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-			}
-		}
-		catch (SocketException socketException)
-		{
-			Debug.Log("Socket exception: " + socketException);
-		}
-	}
-	
-	private void ColorReceived()
-	{
-		if (socketConnection == null)
-		{
-			return;
-		}
-		try
-		{
-			// Get a stream object for writing. 			
-			NetworkStream stream = socketConnection.GetStream();
-			if (stream.CanWrite)
-			{
-				string clientMessage = "Please_Send_Color" + "\n\r\n";
-				
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 
