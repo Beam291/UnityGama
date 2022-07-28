@@ -7,12 +7,6 @@ public class GenerateCube : MonoBehaviour
 {
     #region private member
     private NetworkConnect networkConnect;
-    private string cubeCoordinate = "";
-    private bool isDone = false;
-    #endregion
-
-    #region internal member
-    internal string[] listCubeCoordinate = { };
     #endregion
 
     // Start is called before the first frame update

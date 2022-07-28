@@ -9,8 +9,6 @@ using UnityEngine;
 public class NetworkConnect : MonoBehaviour
 {
     #region internal member
-    internal string gridCoordinate = "";
-	internal string gridColor = "";
 	internal string gridDetail = "";
 	internal string[] listGridDetail = { };
     #endregion
@@ -20,11 +18,7 @@ public class NetworkConnect : MonoBehaviour
 	private Thread clientReceiveThread;
 	
 	private const int PORT = 8052;
-	private ControllerCube controllerCube
-    {
-		get;
-		set;
-    }
+	private ControllerCube controllerCube;
 	#endregion
 
 	// Use this for initialization 	

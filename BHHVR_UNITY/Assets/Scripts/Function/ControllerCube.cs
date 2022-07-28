@@ -25,48 +25,66 @@ public class ControllerCube : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        GenerateCubeReference();
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetListOfCube();
+        //GetListOfCube();
         if (Input.GetMouseButtonDown(0))
         {
+            RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if(Physics.Raycast(ray, out RaycastHit hitInfo))
+            if(Physics.Raycast(ray, out hit))
             {
-                if(hitInfo.transform != null)
+                if(hit.collider != null)
                 {
-                    cubeName = hitInfo.transform.gameObject.name; 
-                    float x = hitInfo.transform.gameObject.transform.position.x;
+                    if(hit.collider.tag == "CubeController")
+                    {
+                        Debug.Log("Clicked");
+                    }
+                    //Debug.Log(hit.collider.tag);
+                    cubeName = hit.transform.gameObject.name; 
+                    float x = hit.transform.gameObject.transform.position.x;
                     cubeX = x.ToString("0.00");
-                    float y = hitInfo.transform.gameObject.transform.position.y;
+                    float y = hit.transform.gameObject.transform.position.y;
                     cubeY = y.ToString("0.00");
-                    float z = hitInfo.transform.gameObject.transform.position.z;
+                    float z = hit.transform.gameObject.transform.position.z;
                     cubeZ = z.ToString("0.00");
                 }
             }
         }
+
     }
 
-    private void GetListOfCube()
+    void OnMouseDown()
+    {
+        // Destroy the gameObject after clicking on it
+        Destroy(gameObject);
+    }
+
+    private void GenerateCubeReference()
     {
         generateCube = GameObject.Find("GenerateCube").GetComponent<GenerateCube>();
-        if (generateCube.listCubeCoordinate.Length == 0)
-        {
-            return;
-        }
-        else
-        {
-            nb_cube = generateCube.listCubeCoordinate.Length;
-        }
     }
 
-    private void OnMouseDown()
-    {
-        Destroy(this.gameObject);
-    }
+    //private void GetListOfCube()
+    //{
+    //    generateCube = GameObject.Find("GenerateCube").GetComponent<GenerateCube>();
+    //    if (generateCube.listCubeCoordinate.Length == 0)
+    //    {
+    //        return;
+    //    }
+    //    else
+    //    {
+    //        nb_cube = generateCube.listCubeCoordinate.Length;
+    //    }
+    //}
+
+    //private void OnMouseDown()
+    //{
+    //    Destroy(this.gameObject);
+    //}
 }

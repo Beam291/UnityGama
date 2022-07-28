@@ -20,10 +20,10 @@ public class ColorTest : MonoBehaviour
         //aFloat = 1;
         //string test = "blue";
         //ColorUtility.TryParseHtmlString(test, out testColor);
-        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        Renderer renderer = cube.GetComponent<Renderer>();
-        cube.name = "CUBES";
-        renderer.material.color = Color.blue;
+        //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //Renderer renderer = cube.GetComponent<Renderer>();
+        //cube.name = "CUBES";
+        //renderer.material.color = Color.blue;
     }
 
     // Update is called once per frame
