@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -5,6 +6,10 @@ using UnityEngine;
 
 public class GenerateCube : MonoBehaviour
 {
+    #region internal member
+    internal bool createCell;
+    #endregion
+
     #region private member
     private NetworkConnect networkConnect;
     #endregion
@@ -18,7 +23,25 @@ public class GenerateCube : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (networkConnect.updateNow == true)
+        {
+            //CreateCube();
+            StartCoroutine(ExampleCoroutine());
+        }
+    }
+
+    IEnumerator ExampleCoroutine()
+    {
+        //Print the time of when the function is first called.
+        Debug.Log("Started Coroutine at timestamp : " + Time.time);
+
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(1);
+
+        //After we have waited 5 seconds print the time again.
         CreateCube();
+
+        networkConnect.updateNow = false;
     }
 
     //Reference the Network class
@@ -36,6 +59,7 @@ public class GenerateCube : MonoBehaviour
         }
         else
         {
+            Debug.Log(networkConnect.listGridDetail.Length);
             for(int i = 0; i < networkConnect.listGridDetail.Length; i++)
             {
                 //Handle each cell
@@ -63,11 +87,11 @@ public class GenerateCube : MonoBehaviour
 
                 //Start generate Cube
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.transform.position = new Vector3(
+                cube.transform.parent = GameObject.Find("CanvasCellController").transform;
+                cube.transform.localPosition = new Vector3(
                     cellCoordinate[0],
                     cellCoordinate[1],
                     cellCoordinate[2]);
-                cube.transform.parent = GameObject.Find("ListOfGrid").transform;
                 cube.name = "cube" + i;
 
                 //Set tag to the gameobject

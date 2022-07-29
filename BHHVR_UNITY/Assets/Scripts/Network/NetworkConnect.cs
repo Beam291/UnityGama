@@ -11,6 +11,7 @@ public class NetworkConnect : MonoBehaviour
     #region internal member
 	internal string gridDetail = "";
 	internal string[] listGridDetail = { };
+	internal bool updateNow = false;
     #endregion
 
     #region private members
@@ -19,13 +20,15 @@ public class NetworkConnect : MonoBehaviour
 	
 	private const int PORT = 8052;
 	private ControllerCube controllerCube;
+	private GenerateCube generateCube;
 	#endregion
 
 	// Use this for initialization 	
 	void Start()
 	{
 		ConnectToTcpServer();
-		controllerReference();
+		ControllerReference();
+		GenerateCubeReference();
 	}
 
 	// Update is called once per frame
@@ -34,7 +37,18 @@ public class NetworkConnect : MonoBehaviour
         //Get the coordinate of the grid and color of it.
         if (Input.GetKeyDown(KeyCode.F))
         {
-            DetailMessage();
+            bool destroyed = false;
+            if (destroyed == false)
+            {
+                DestroyGameObjectsWithTag("CubeController");
+                destroyed = true;
+            }
+            if (destroyed == true)
+            {
+                DetailMessage();
+                updateNow = true;
+				//destroyed = false;
+            }
         }
 
 		//Prase the Data which gets from the GAMA
@@ -47,9 +61,14 @@ public class NetworkConnect : MonoBehaviour
         }
 	}
 
-	private void controllerReference()
+	private void ControllerReference()
     {
 		controllerCube = GameObject.Find("ControllerCube").GetComponent<ControllerCube>();
+    }
+
+	private void GenerateCubeReference()
+    {
+		generateCube = GameObject.Find("GenerateCube").GetComponent<GenerateCube>();
     }
 
 	// Setup socket connection. 		
@@ -171,4 +190,14 @@ public class NetworkConnect : MonoBehaviour
 			Debug.Log("Socket exception: " + socketException);
 		}
 	}
+
+	public static void DestroyGameObjectsWithTag(string tag)
+	{
+		GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(tag);
+		foreach (GameObject target in gameObjects)
+		{
+			GameObject.Destroy(target);
+		}
+	}
+
 }

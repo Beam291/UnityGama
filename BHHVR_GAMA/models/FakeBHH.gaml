@@ -24,6 +24,15 @@ global{
 	int cycle;
 		
 	init{
+		loop i from: 0 to: 7{
+			loop j from: 0 to: 7{
+				string cellLocation <- Plot[i,j].location;
+				string cellColor <- Plot[i,j].color;
+				
+				add "<" + cellLocation + " ; " + cellColor +">"  to: gridDetail;
+			}
+		}
+		
 		if (type = "server") {
 			do CreateServer;
 		}
@@ -90,7 +99,7 @@ species Server skills: [network] parallel:true{
 	}
 	
 	reflex Send{
-		if(unityMessage = "Send_Detail"){
+		if(unityMessage = "Send_Detail") and (length(gridDetail) = 64){
 			do send to: client contents: gridDetail;
 		}
 	}

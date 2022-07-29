@@ -17,20 +17,14 @@ public class ColorTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //aFloat = 1;
-        //string test = "blue";
-        //ColorUtility.TryParseHtmlString(test, out testColor);
         //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //Renderer renderer = cube.GetComponent<Renderer>();
-        //cube.name = "CUBES";
-        //renderer.material.color = Color.blue;
+        //cube.transform.parent = GameObject.Find("SomethingTesting").transform;
+        //cube.transform.localPosition = new Vector3(0, 0, 0);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        ////Debug.Log(ColorUtility.ToHtmlStringRGBA(testColor));
-        //renderer = gameObject.GetComponent<Renderer>();
-        //renderer.material.color = testColor;
     }
 }
