@@ -26,22 +26,22 @@ public class GenerateCube : MonoBehaviour
         if (networkConnect.updateNow == true)
         {
             //CreateCube();
-            StartCoroutine(ExampleCoroutine());
+            StartCoroutine(WaitingForTCPConnected());
+            //CreateCube();
+
+            networkConnect.updateNow = false;
         }
     }
 
-    IEnumerator ExampleCoroutine()
+    IEnumerator WaitingForTCPConnected()
     {
-        //Print the time of when the function is first called.
-        Debug.Log("Started Coroutine at timestamp : " + Time.time);
-
-        //yield on a new YieldInstruction that waits for 5 seconds.
+        //yield on a new YieldInstruction that waits for 1 seconds.
         yield return new WaitForSeconds(1);
 
-        //After we have waited 5 seconds print the time again.
+        //After 1 second the function will run
         CreateCube();
 
-        networkConnect.updateNow = false;
+        //networkConnect.updateNow = false;
     }
 
     //Reference the Network class
@@ -85,6 +85,9 @@ public class GenerateCube : MonoBehaviour
                 Color cellColor;
                 ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
 
+                //Get cell name
+                string cellName = cellDetail[2];
+
                 //Start generate Cube
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.transform.parent = GameObject.Find("CanvasCellController").transform;
@@ -92,7 +95,7 @@ public class GenerateCube : MonoBehaviour
                     cellCoordinate[0],
                     cellCoordinate[1],
                     cellCoordinate[2]);
-                cube.name = "cube" + i;
+                cube.name = cellName;
 
                 //Set tag to the gameobject
                 cube.gameObject.tag = "CubeController";

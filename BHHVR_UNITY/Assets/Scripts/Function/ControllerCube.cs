@@ -12,6 +12,8 @@ public class ControllerCube : MonoBehaviour
     internal string cubeX;
     internal string cubeY;
     internal string cubeZ;
+
+    internal string cubeName;
     internal string colorCube
     {
         get;
@@ -23,6 +25,7 @@ public class ControllerCube : MonoBehaviour
     void Start()
     {
         GenerateCubeReference();
+        colorCube = "red";
     }
 
     // Update is called once per frame
@@ -38,12 +41,12 @@ public class ControllerCube : MonoBehaviour
             {
                 if (hit.collider.tag == "CubeController")
                 {
-                    float x = hit.collider.gameObject.transform.position.x;
-                    cubeX = x.ToString("0.00");
-                    float y = hit.transform.gameObject.transform.position.y;
-                    cubeY = y.ToString("0.00");
-                    float z = hit.transform.gameObject.transform.position.z;
-                    cubeZ = z.ToString("0.00");
+                    cubeName = hit.collider.gameObject.transform.name;
+                    //cubeX = x.ToString("0.00");
+                    //float y = hit.transform.gameObject.transform.position.y;
+                    //cubeY = y.ToString("0.00");
+                    //float z = hit.transform.gameObject.transform.position.z;
+                    //cubeZ = z.ToString("0.00");
                 }
             }
         }

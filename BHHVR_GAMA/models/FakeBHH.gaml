@@ -28,10 +28,13 @@ global{
 			loop j from: 0 to: 7{
 				string cellLocation <- Plot[i,j].location;
 				string cellColor <- Plot[i,j].color;
+				string cellName <- Plot[i,j].name;
 				
-				add "<" + cellLocation + " ; " + cellColor +">"  to: gridDetail;
+				add "<" + cellLocation + " ; " + cellColor + " ; " + cellName + ">"  to: gridDetail;
 			}
 		}
+		
+		write gridDetail; 
 		
 		if (type = "server") {
 			do CreateServer;
@@ -46,8 +49,9 @@ global{
 				loop j from: 0 to: 7{
 					string cellLocation <- Plot[i,j].location;
 					string cellColor <- Plot[i,j].color;
+					string cellName <- Plot[i,j].name;
 					
-					add "<" + cellLocation + " ; " + cellColor +">"  to: gridDetail;
+					add "<" + cellLocation + " ; " + cellColor + " ; " + cellName + ">"  to: gridDetail;
 				}
 			}
 			
@@ -72,14 +76,16 @@ global{
 		}
 		
 		point selectedCellCoordinate;
+		string selectedCellName;
 		string selectedCellColor;
 		
-		selectedCellCoordinate <- selectedCell[0];
+		selectedCellName <- selectedCell[0];
+//		selectedCellCoordinate <- selectedCell[0];
 		selectedCellColor <- selectedCell[1];
 		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				if(Plot[i,j].location = selectedCellCoordinate){
+				if(Plot[i,j].name = selectedCellName){
 					Plot[i,j].color <- selectedCellColor;
 				}
 			}
