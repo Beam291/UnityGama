@@ -8,6 +8,11 @@
 model FakeBHH
 
 global{
+	shape_file riverShapeFile <- shape_file("../includes/BHH_File/rivers.shp");
+	shape_file gateShapeFile <- shape_file("../includes/BHH_File/gates.shp");
+
+	geometry shape <- envelope(riverShapeFile);
+
 	unknown client <- nil;
 	bool once <- true;
 	
@@ -22,8 +27,19 @@ global{
 	list<string> cellColor;
 	
 	int cycle;
+	
+	list<string> gateLocation;
+	
+	list<string> sendMes;
 		
 	init{
+		create River from: riverShapeFile;
+		create Gate from: gateShapeFile;
+		
+		write shape.location;
+		write shape.height/10000;
+		write shape.width/10000;
+		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
 				string cellLocation <- Plot[i,j].location;
@@ -31,15 +47,26 @@ global{
 				string cellName <- Plot[i,j].name;
 				
 				add "<" + cellLocation + " ; " + cellColor + " ; " + cellName + ">"  to: gridDetail;
+				write Plot[0,0].name;
+				write Plot[0,1].name;
+				Plot[0,2].color <- #red;
 			}
 		}
 		
-		write gridDetail; 
+		loop i over: get_all_instances(Gate){
+			add i.location to: gateLocation;
+		}
+		
+		
 		
 		if (type = "server") {
 			do CreateServer;
 		}
 	}
+	
+	list<agent> get_all_instances(species<agent> spec) {
+        return spec.population +  spec.subspecies accumulate (get_all_instances(each));
+    }
 	
 	reflex LiveGrid{
 		if(unityMessage = "Send_Detail"){
@@ -51,7 +78,7 @@ global{
 					string cellColor <- Plot[i,j].color;
 					string cellName <- Plot[i,j].name;
 					
-					add "<" + cellLocation + " ; " + cellColor + " ; " + cellName + ">"  to: gridDetail;
+					add "<" + cellLocation + " ; " + cellColor + " ; " + cellName +  ">"  to: gridDetail;
 				}
 			}
 			
@@ -93,6 +120,12 @@ global{
 	}
 }
 
+species Gate {
+	aspect default{
+		draw circle(0.5#km) color: #red border: #black;
+	}
+}
+
 species Server skills: [network] parallel:true{
 	//receive message when detect message send from client 
 	reflex Receive when: has_more_message() {
@@ -106,8 +139,14 @@ species Server skills: [network] parallel:true{
 	
 	reflex Send{
 		if(unityMessage = "Send_Detail") and (length(gridDetail) = 64){
-			do send to: client contents: gridDetail;
+			do send to: client contents: gridDetail + '1' + gateLocation;
 		}
+	}
+}
+
+species River{
+	aspect base{
+		draw (shape) color: #black;
 	}
 }
 
@@ -120,7 +159,9 @@ grid Plot width: 8 height: 8{
 experiment Run type: gui{
 	output{
 		display map{
-			grid Plot border: #black;
+			species Gate aspect: default;
+			species River aspect: base;
+			grid Plot border: #black transparency:0.5;
 		}
 	}
 }

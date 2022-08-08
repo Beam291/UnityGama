@@ -9,8 +9,9 @@ using UnityEngine;
 public class NetworkConnect : MonoBehaviour
 {
     #region internal member
-	internal string gridDetail = "";
+	internal string dataGama = "";
 	internal string[] listGridDetail = { };
+	internal string[] listGate = { };
 	internal bool updateNow = false;
     #endregion
 
@@ -105,7 +106,8 @@ public class NetworkConnect : MonoBehaviour
                         Array.Copy(bytes, 0, incommingData, 0, length);
 						// Convert byte array to string message. 	
 						string serverMes = Encoding.ASCII.GetString(incommingData);
-						gridDetail = serverMes;
+						dataGama = serverMes;
+						//Debug.Log(dataGama);
                     }
 				}
 			}
@@ -118,22 +120,31 @@ public class NetworkConnect : MonoBehaviour
 
 	private void PraseData()
     {
-        if (string.IsNullOrEmpty(gridDetail))
+        if (string.IsNullOrEmpty(dataGama))
         {
 			return;
         }
         else
         {
-			gridDetail = gridDetail.TrimStart('[');
-			gridDetail = gridDetail.TrimEnd();
-			gridDetail = gridDetail.TrimEnd(']');
-			gridDetail = gridDetail.TrimStart('<');
-			gridDetail = gridDetail.TrimEnd('>');
+			string[] tempData = { };
+			dataGama = dataGama.TrimStart('[');
+			dataGama = dataGama.TrimEnd();
+			dataGama = dataGama.TrimEnd(']');
+			//dataGama = dataGama.TrimStart('<');
+			//dataGama = dataGama.TrimEnd('>');
 
-			string pattern = ">, <";
-			listGridDetail = Regex.Split(gridDetail, pattern);
-		}
-	}
+			string pattern_2 = ", 1,";
+			tempData = Regex.Split(dataGama, pattern_2);
+
+            tempData[0] = tempData[0].TrimStart('<');
+			tempData[0] = tempData[0].TrimEnd();
+            tempData[0] = tempData[0].TrimEnd('>');
+			tempData[0] = tempData[0].TrimStart();
+
+            string pattern = ">, <";
+            listGridDetail = Regex.Split(tempData[0], pattern);
+        }
+    }
 
 	// Send detail of the gama grid to unity. 	
 	private void DetailMessage()
