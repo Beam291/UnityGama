@@ -125,7 +125,7 @@ public class GenerateCube : MonoBehaviour
                     
                     cube.gameObject.tag = "CubeController"; //add tag to each cube
 
-                    cube.transform.localScale = new Vector3(0.06f, 0.06f, 2f);
+                    cube.transform.localScale = new Vector3(0.06f, 0.06f, 2f); // modify the scale of the cube
                 }
             }
 
@@ -155,56 +155,6 @@ public class GenerateCube : MonoBehaviour
                     }
                 }
             }
-
-            //old generate cube
-            //for (int i = 0; i < networkConnect.listGridDetail.Length; i++)
-            //{
-            //    //Handle each cell
-            //    string[] cellDetail = { };
-            //    string pattern = " ; ";
-            //    cellDetail = Regex.Split(networkConnect.listGridDetail[i], pattern);
-
-            //    //Get coordinate of cell
-            //    string cellCoordinate_string = cellDetail[0];
-            //    cellCoordinate_string = cellCoordinate_string.TrimStart('{'); 
-            //    cellCoordinate_string = cellCoordinate_string.TrimEnd('}');
-            //    string[] cellCoordinate_string_array = cellCoordinate_string.Split(',');
-            //    List<float> cellCoordinate_float_list = new List<float>();
-            //    for(int j = 0; j < cellCoordinate_string_array.Length; j++)
-            //    {
-            //        float value = float.Parse(cellCoordinate_string_array[j], CultureInfo.InvariantCulture.NumberFormat);
-            //        cellCoordinate_float_list.Add(value);
-            //    }
-            //    float[] cellCoordinate = cellCoordinate_float_list.ToArray();
-                
-            //    //Get color of cell
-            //    string cellColor_string = cellDetail[1];
-            //    Color cellColor;
-            //    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
-
-            //    //Get cell name
-            //    string cellName = cellDetail[2];
-
-                //new generate cube function
-                
-
-                //Start generate Cube
-                //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                //GameObject mapTable = GameObject.Find("MapTable");
-                //cube.transform.parent = GameObject.Find("MapTable").transform;
-                //cube.transform.position = new Vector3(
-                //    cellCoordinate[0]/100000 - 2.8093183125f,
-                //    cellCoordinate[1]/100000 , 
-                //    0.5f);
-                //cube.name = cellName;
-
-                ////Set tag to the gameobject
-                //cube.gameObject.tag = "CubeController";
-
-                ////Assign color to cube
-                //Renderer renderer = cube.GetComponent<Renderer>();
-                //renderer.material.color = cellColor;
-            //}
         }
     }
 }
