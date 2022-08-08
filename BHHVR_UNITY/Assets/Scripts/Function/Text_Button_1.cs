@@ -5,11 +5,11 @@ using UnityEngine;
 public class Text_Button_1 : MonoBehaviour
 {
     // Start is called before the first frame update
-    private ControllerCube controllerCube;
+    private CubeController cubeController;
 
     public void SelectColor()
     {
-        controllerCube = GameObject.Find("ControllerCube").GetComponent<ControllerCube>();
-        controllerCube.colorCube = "red";
+        cubeController = GameObject.Find("CubeController").GetComponent<CubeController>();
+        cubeController.colorCube = "red";
     }
 }

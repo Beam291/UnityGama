@@ -20,7 +20,7 @@ public class NetworkConnect : MonoBehaviour
 	private Thread clientReceiveThread;
 	
 	private const int PORT = 8052;
-	private ControllerCube controllerCube;
+	private CubeController cubeController;
 	private GenerateCube generateCube;
 	#endregion
 
@@ -63,7 +63,7 @@ public class NetworkConnect : MonoBehaviour
 
 	private void ControllerReference()
     {
-		controllerCube = GameObject.Find("ControllerCube").GetComponent<ControllerCube>();
+		cubeController = GameObject.Find("CubeController").GetComponent<CubeController>();
     }
 
 	private void GenerateCubeReference()
@@ -182,7 +182,7 @@ public class NetworkConnect : MonoBehaviour
 			NetworkStream stream = socketConnection.GetStream();
 			if (stream.CanWrite)
 			{
-				string clientMessage = controllerCube.cubeName + '|' + controllerCube.colorCube + "\n\r\n";
+				string clientMessage = cubeController.cubeName + '|' + cubeController.colorCube + "\n\r\n";
 
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);

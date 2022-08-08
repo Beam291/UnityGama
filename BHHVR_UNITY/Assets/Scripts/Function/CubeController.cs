@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ControllerCube : MonoBehaviour
+public class CubeController : MonoBehaviour
 {
     #region private member
     private GenerateCube generateCube;
@@ -31,7 +31,7 @@ public class ControllerCube : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //GetListOfCube();
+        //When the mouse is clicked it will get the information of 
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
@@ -42,11 +42,6 @@ public class ControllerCube : MonoBehaviour
                 if (hit.collider.tag == "CubeController")
                 {
                     cubeName = hit.collider.gameObject.transform.name;
-                    //cubeX = x.ToString("0.00");
-                    //float y = hit.transform.gameObject.transform.position.y;
-                    //cubeY = y.ToString("0.00");
-                    //float z = hit.transform.gameObject.transform.position.z;
-                    //cubeZ = z.ToString("0.00");
                 }
             }
         }

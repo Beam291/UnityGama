@@ -60,10 +60,8 @@ public class GenerateCube : MonoBehaviour
         //yield on a new YieldInstruction that waits for 3 seconds.
         yield return new WaitForSeconds(3);
 
-        //After 1 second the function will run
+        //After 3 second the function will run
         CreateCube();
-
-        //networkConnect.updateNow = false;
     }
 
     //Reference the Network class
