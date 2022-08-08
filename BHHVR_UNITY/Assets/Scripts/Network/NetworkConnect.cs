@@ -107,7 +107,6 @@ public class NetworkConnect : MonoBehaviour
 						// Convert byte array to string message. 	
 						string serverMes = Encoding.ASCII.GetString(incommingData);
 						dataGama = serverMes;
-						//Debug.Log(dataGama);
                     }
 				}
 			}
@@ -130,8 +129,6 @@ public class NetworkConnect : MonoBehaviour
 			dataGama = dataGama.TrimStart('[');
 			dataGama = dataGama.TrimEnd();
 			dataGama = dataGama.TrimEnd(']');
-			//dataGama = dataGama.TrimStart('<');
-			//dataGama = dataGama.TrimEnd('>');
 
 			string pattern_2 = ", 1,";
 			tempData = Regex.Split(dataGama, pattern_2);
@@ -199,6 +196,7 @@ public class NetworkConnect : MonoBehaviour
 		}
 	}
 
+	//Function destroy game object
 	public static void DestroyGameObjectsWithTag(string tag)
 	{
 		GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(tag);

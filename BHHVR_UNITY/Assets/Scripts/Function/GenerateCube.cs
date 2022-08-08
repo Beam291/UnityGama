@@ -57,8 +57,8 @@ public class GenerateCube : MonoBehaviour
 
     IEnumerator WaitingForTCPConnected()
     {
-        //yield on a new YieldInstruction that waits for 1 seconds.
-        yield return new WaitForSeconds(1);
+        //yield on a new YieldInstruction that waits for 3 seconds.
+        yield return new WaitForSeconds(3);
 
         //After 1 second the function will run
         CreateCube();
@@ -80,6 +80,7 @@ public class GenerateCube : MonoBehaviour
         mapScaleY = mapTable.transform.localScale.y;
         mapScaleZ = mapTable.transform.localScale.z;
 
+        //Map table postion
         mapPositionX = mapTable.transform.position.x;
         mapPositionY = mapTable.transform.position.y;
         mapPositionZ = mapTable.transform.position.z;
@@ -89,7 +90,7 @@ public class GenerateCube : MonoBehaviour
         mapFocalPointY = mapScaleY / 2;
         mapFocalPointZ = mapScaleZ / 2;
         
-        //Cell
+        //Cell width and height
         cellWidth = mapScaleX / 8;
         cellHeight = mapScaleY / 8;
 
@@ -116,8 +117,9 @@ public class GenerateCube : MonoBehaviour
             {
                 for (float j = firstCellFocalPointY; j > (mapPositionY - mapFocalPointY); j -= cellHeight)
                 {
-                    GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    cube.transform.parent = GameObject.Find("MapTable").transform;
+                    GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube); // create new cube
+
+                    cube.transform.parent = GameObject.Find("MapTable").transform; // Find the map table
 
                     cube.transform.position = new Vector3(i, j, mapPositionZ); //assign the position to concur with the grid in GAMA
 
@@ -134,10 +136,12 @@ public class GenerateCube : MonoBehaviour
             {
                 for(int j = 0; j < 8; j++)
                 {
+                    //Assign name that concur with the name from nameUnity in GAMA
                     GameObject cube = GameObject.Find("CubeNoName");
                     cube.name = "Plot" + i + j;
                     string cubeID = "" + i + j;
 
+                    //Assign color to the cube
                     for (int k = 0; k < networkConnect.listGridDetail.Length; k++)
                     {
                         string[] cellDetail = { };
