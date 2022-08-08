@@ -42,8 +42,6 @@ public class GenerateCube : MonoBehaviour
     {
         MeasureCube();
         NetworkReference();
-
-        
     }
 
     // Update is called once per frame
@@ -102,20 +100,6 @@ public class GenerateCube : MonoBehaviour
         //First cell - this is the first cell will foundation for others cell
         firstCellFocalPointX = (mapPositionX - mapFocalPointX) + cellFocalPointX;
         firstCellFocalPointY = (mapPositionY + mapFocalPointY) - cellFocalPointY;
-
-        //for (float i = firstCellFocalPointX; i < (mapPositionX + mapFocalPointX); i += cellWidth)
-        //{
-        //    for (float j = firstCellFocalPointY; j < (mapPositionY - mapFocalPointY); j -= cellHeight)
-        //    {
-        //        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //        Debug.Log("HI");
-        //        cube.transform.position = new Vector3(
-        //            i,
-        //            j,
-        //            0);
-        //    }
-        //}
-
     }
 
     //Create Cube
@@ -127,67 +111,79 @@ public class GenerateCube : MonoBehaviour
         }
         else
         {
+            //new generate cube depend on the maptable has already created
             for (float i = firstCellFocalPointX; i < (mapPositionX + mapFocalPointX); i += cellWidth)
             {
                 for (float j = firstCellFocalPointY; j > (mapPositionY - mapFocalPointY); j -= cellHeight)
                 {
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.transform.parent = GameObject.Find("MapTable").transform;
-                    cube.transform.position = new Vector3(i, j, mapPositionZ);
-                    for(int k = 0; k < networkConnect.listGridDetail.Length; k++)
+
+                    cube.transform.position = new Vector3(i, j, mapPositionZ); //assign the position to concur with the grid in GAMA
+
+                    cube.name = "CubeNoName"; //default name, it will be change later
+                    
+                    cube.gameObject.tag = "CubeController"; //add tag to each cube
+
+                    cube.transform.localScale = new Vector3(0.06f, 0.06f, 2f);
+                }
+            }
+
+            //Assign Name and color for the cube
+            for (int i = 0; i < 8; i++)
+            {
+                for(int j = 0; j < 8; j++)
+                {
+                    GameObject cube = GameObject.Find("CubeNoName");
+                    cube.name = "Plot" + i + j;
+                    string cubeID = "" + i + j;
+
+                    for (int k = 0; k < networkConnect.listGridDetail.Length; k++)
                     {
                         string[] cellDetail = { };
                         string pattern = " ; ";
                         cellDetail = Regex.Split(networkConnect.listGridDetail[k], pattern);
-                        string cellName = cellDetail[2];
 
-                        cube.name = cellName;
+                        if (cubeID == cellDetail[0])
+                        {
+                            string cellColor_string = cellDetail[1];
+                            Color cellColor;
+                            ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                            Renderer renderer = cube.GetComponent<Renderer>();
+                            renderer.material.color = cellColor;
+                        }
                     }
-
                 }
             }
-            //for (int m = 0; m < 8; m++)
+
+            //old generate cube
+            //for (int i = 0; i < networkConnect.listGridDetail.Length; i++)
             //{
-            //    for (int n = 0; n < 8; n++)
+            //    //Handle each cell
+            //    string[] cellDetail = { };
+            //    string pattern = " ; ";
+            //    cellDetail = Regex.Split(networkConnect.listGridDetail[i], pattern);
+
+            //    //Get coordinate of cell
+            //    string cellCoordinate_string = cellDetail[0];
+            //    cellCoordinate_string = cellCoordinate_string.TrimStart('{'); 
+            //    cellCoordinate_string = cellCoordinate_string.TrimEnd('}');
+            //    string[] cellCoordinate_string_array = cellCoordinate_string.Split(',');
+            //    List<float> cellCoordinate_float_list = new List<float>();
+            //    for(int j = 0; j < cellCoordinate_string_array.Length; j++)
             //    {
-            //        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            //        GameObject mapTable = GameObject.Find("MapTable");
-            //        cube.transform.parent = GameObject.Find("MapTable").transform;
-            //        cube.gameObject.tag = "CubeController";
-            //        //cube.name = cellName;
-            //        cube.transform.position = new Vector3(
-            //            0,
-            //            0,
-            //            0.5f);
+            //        float value = float.Parse(cellCoordinate_string_array[j], CultureInfo.InvariantCulture.NumberFormat);
+            //        cellCoordinate_float_list.Add(value);
             //    }
-            //}
-            for (int i = 0; i < networkConnect.listGridDetail.Length; i++)
-            {
-                //Handle each cell
-                string[] cellDetail = { };
-                string pattern = " ; ";
-                cellDetail = Regex.Split(networkConnect.listGridDetail[i], pattern);
-
-                //Get coordinate of cell
-                string cellCoordinate_string = cellDetail[0];
-                cellCoordinate_string = cellCoordinate_string.TrimStart('{'); 
-                cellCoordinate_string = cellCoordinate_string.TrimEnd('}');
-                string[] cellCoordinate_string_array = cellCoordinate_string.Split(',');
-                List<float> cellCoordinate_float_list = new List<float>();
-                for(int j = 0; j < cellCoordinate_string_array.Length; j++)
-                {
-                    float value = float.Parse(cellCoordinate_string_array[j], CultureInfo.InvariantCulture.NumberFormat);
-                    cellCoordinate_float_list.Add(value);
-                }
-                float[] cellCoordinate = cellCoordinate_float_list.ToArray();
+            //    float[] cellCoordinate = cellCoordinate_float_list.ToArray();
                 
-                //Get color of cell
-                string cellColor_string = cellDetail[1];
-                Color cellColor;
-                ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+            //    //Get color of cell
+            //    string cellColor_string = cellDetail[1];
+            //    Color cellColor;
+            //    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
 
-                //Get cell name
-                string cellName = cellDetail[2];
+            //    //Get cell name
+            //    string cellName = cellDetail[2];
 
                 //new generate cube function
                 
@@ -208,7 +204,7 @@ public class GenerateCube : MonoBehaviour
                 ////Assign color to cube
                 //Renderer renderer = cube.GetComponent<Renderer>();
                 //renderer.material.color = cellColor;
-            }
+            //}
         }
     }
 }

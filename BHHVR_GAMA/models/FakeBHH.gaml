@@ -44,14 +44,15 @@ global{
 			loop j from: 0 to: 7{
 				string cellLocation <- Plot[i,j].location;
 				string cellColor <- Plot[i,j].color;
-				string cellName <- Plot[i,j].name;
+				Plot[i,j].nameUnity <- "Plot"+i+j;
 				
-				add "<" + cellLocation + " ; " + cellColor + " ; " + cellName + ">"  to: gridDetail;
-				write Plot[0,0].name;
-				write Plot[0,1].name;
-				Plot[0,2].color <- #red;
+				string cellID <- ""+i+j;
+				
+				add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;
+				
 			}
 		}
+				
 		
 		loop i over: get_all_instances(Gate){
 			add i.location to: gateLocation;
@@ -76,9 +77,13 @@ global{
 				loop j from: 0 to: 7{
 					string cellLocation <- Plot[i,j].location;
 					string cellColor <- Plot[i,j].color;
-					string cellName <- Plot[i,j].name;
 					
-					add "<" + cellLocation + " ; " + cellColor + " ; " + cellName +  ">"  to: gridDetail;
+					Plot[i,j].nameUnity <- "Plot"+i+j;
+					
+					string cellID <- ""+i+j;
+				
+					add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;
+				
 				}
 			}
 			
@@ -107,12 +112,11 @@ global{
 		string selectedCellColor;
 		
 		selectedCellName <- selectedCell[0];
-//		selectedCellCoordinate <- selectedCell[0];
 		selectedCellColor <- selectedCell[1];
 		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				if(Plot[i,j].name = selectedCellName){
+				if(Plot[i,j].nameUnity = selectedCellName){
 					Plot[i,j].color <- selectedCellColor;
 				}
 			}
@@ -151,6 +155,8 @@ species River{
 }
 
 grid Plot width: 8 height: 8{
+	string nameUnity;
+	
 	init{
 		one_of(Plot).color <- #green;
 	}
