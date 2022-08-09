@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 89163698}
   - component: {fileID: 89163699}
   m_Layer: 0
-  m_Name: ControllerCube
+  m_Name: CubeController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
