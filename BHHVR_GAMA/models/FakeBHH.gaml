@@ -8,11 +8,45 @@
 model FakeBHH
 
 global{
-	shape_file riverShapeFile <- shape_file("../includes/BHH_File/rivers.shp");
-	shape_file gateShapeFile <- shape_file("../includes/BHH_File/gates.shp");
+	//recreate code
+	file gates_shape_file <- shape_file("../includes/BachHungHaiData/gates.shp");
+	file rivers_shape_file <- shape_file("../includes/BachHungHaiData/rivers.shp");
+	file main_rivers_shape_file <- shape_file("../includes/BachHungHaiData/main_rivers_simple.shp");
+	file river_flows_shape_file <- shape_file("../includes/BachHungHaiData/river_flows.shp");
+	file landuse_shape_file <- shape_file("../includes/BachHungHaiData/VNM_adm4.shp");
 
-	geometry shape <- envelope(riverShapeFile);
+	graph the_river;
+	geometry shape <- envelope(main_rivers_shape_file);	
+	
+	list<string> cells_types <- ["Aquaculture", "Rice","Vegetables", "Industrial", "Null"];
+	
+	map<string, rgb> cells_colors <- [cells_types[0]::#orange, cells_types[1]::#darkgreen,cells_types[2]::#lightgreen, cells_types[3]::#red, cells_types[4]::#black];
+	map<string, float> cells_withdrawal <- [cells_types[0]::0.5, cells_types[1]::3.0,cells_types[2]::0.25, cells_types[3]::4.0];
+	map<string, int> cells_pollution <- [cells_types[0]::55, cells_types[1]::0,cells_types[2]::20, cells_types[3]::90];
+	
+	bool showGrid parameter: 'Show grid' category: "Parameters" <-false;
+	bool showWater parameter: 'Show Water' category: "Parameters" <-true;
+	bool showLanduse parameter: 'Show LandUse' category: "Parameters" <-true; 
+	bool showDryness parameter: 'Show Dryness' category: "Parameters" <-false; 
+	
+	bool showLegend parameter: 'Show Legend' category: "Legend" <-true;
+    bool showOutput parameter: 'Show Output' category: "Legend" <-true;
+	
+	bool keystoning parameter: 'Show keystone grid' category: "Keystone" <-false;
 
+	list<Gate> source;
+	list<Gate> dest;
+	
+	map<River,float> probaEdges;
+	
+	float evaporationAvgTime parameter: 'Evaporation time' category: "Parameters" step: 10.0 min: 2.0 max:10000.0 <- 2500.0 ;
+	float StaticPollutionEvaporationAvgTime parameter: 'Pollution Evaporation time' category: "Parameters" step: 10.0 min: 2.0 max:10000.0 <- 500.0 ;
+	int grid_height <- 8;
+	int grid_width <- 8;
+	
+	int dryness_removal_amount parameter: 'Water Evaporation time' category: "Parameters" step: 10 min: 10 max:1000 <- 100 ; 
+	
+	//my code
 	unknown client <- nil;
 	bool once <- true;
 	
@@ -30,21 +64,60 @@ global{
 	
 	list<string> gateLocation;
 	
-	list<string> sendMes;
+	map<string, int> testMap <- ['A'::0, 'B'::1];
 		
 	init{
-		create River from: riverShapeFile;
-		create Gate from: gateShapeFile;
+		//recreate
+		create MainRiver from:main_rivers_shape_file{
+			shape<-(simplification(shape,100));
+		}
 		
-		write shape.location;
-		write shape.height/10000;
-		write shape.width/10000;
+		create River from: rivers_shape_file;
+		create Gate from: gates_shape_file with: [type:: string(read('Type'))];
+		create Landuse from: landuse_shape_file with:[type::string(get("SIMPLE"))]{
+			shape<-(simplification(shape,100));
+		}
 		
+		ask Plot {
+			do init_cell;
+		}
+		
+		ask River {
+			overlapping_cell <- first(Plot overlapping self);
+		}
+		
+		the_river <- as_edge_graph(River);
+		probaEdges <- create_map(River as list,list_with(length(River),100.0));
+		
+		ask River {
+			overlapping_cell <- first(Plot overlapping self);
+		}
+		
+		ask Landuse {
+			if !empty(Plot overlapping self) {
+				Plot c <- (Plot overlapping self) with_max_of(inter(each.shape,self.shape).area);
+				c.landuse_on_cell <+ self;
+			}
+		}
+		
+		source <- Gate where (each.type = "source");
+		dest <- Gate where (each.type = "sink");
+		
+		ask Gate {
+			controledRivers <- River overlapping (0.4#km around self.location);
+		}
+		
+		the_river <- as_edge_graph(River);
+		probaEdges <- create_map(River as list,list_with(length(River),100.0));
+		
+		//old code
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
 				string cellLocation <- Plot[i,j].location;
 				string cellColor <- Plot[i,j].color;
 				Plot[i,j].nameUnity <- "Plot"+i+j;
+				
+				write Plot[1,2].type;
 				
 				string cellID <- ""+i+j;
 				
@@ -58,13 +131,12 @@ global{
 			add i.location to: gateLocation;
 		}
 		
-		
-		
 		if (type = "server") {
 			do CreateServer;
 		}
 	}
 	
+	//get all the agent of a specie 
 	list<agent> get_all_instances(species<agent> spec) {
         return spec.population +  spec.subspecies accumulate (get_all_instances(each));
     }
@@ -124,12 +196,106 @@ global{
 	}
 }
 
+//river specification
 species Gate {
-	aspect default{
-		draw circle(0.5#km) color: #red border: #black;
+	rgb color <- rnd_color(255);
+	string Name;
+	string type; // amongst "source", "sink" or "null".
+	geometry shape <- circle(0.75#km);	
+	bool is_closed<-false;
+	list<River> controledRivers <- [];
+
+	action take_water {
+		ask (agents of_generic_species Water) overlapping self{do die;}
+	}
+	
+	aspect base {
+		if is_closed{
+			draw circle(0.75#km)-circle(0.4#km) color:  #red  border: #black;
+		}else{
+			if self.type = "source" {
+				draw circle(0.75#km) - circle(0.40#km) color:  rgb(0,162,232)  border: #black;
+			}else if self.type = "sink" {
+			//	draw circle(0.75#km) - circle(0.40#km) color:  #white;//  border: #black;
+			}else{
+				draw circle(0.75#km)-circle(0.4#km) color:  #green  border: #black;
+			}
+		}
 	}
 }
 
+species MainRiver{
+	aspect base{
+		draw shape color:#blue width:2;
+	}
+}
+
+species River{
+	int waterLevel <- 0;
+	bool is_closed <- false;
+	Plot overlapping_cell;
+	
+	aspect base{
+	  draw shape color: is_closed? #red:rgb(235-235*sqrt(min([waterLevel,8])/8),235-235*sqrt(min([waterLevel,8])/8),255) width:3;		
+	}
+	
+//	aspect base{
+//		draw (shape) color: #black;
+//	}
+}
+
+species Water skills: [moving] {
+	rgb color <- #blue;
+	int amount<-250;
+	River edge;
+	float tmp;
+
+	reflex move {	
+		if edge != nil{
+			tmp <- probaEdges[edge];
+			put 1.0 at: edge in: probaEdges;	
+		}
+		do wander on: the_river speed: 450.0 proba_edges: probaEdges;
+		if edge != nil{
+			put tmp at: edge in: probaEdges;	
+		}
+		edge <- River(current_edge);
+	}
+	
+	reflex evaporate when: (flip(1/evaporationAvgTime)){
+		do die;
+	}
+	
+	aspect default {
+		if(showWater){
+		  draw square(0.25#km)  color: color;		
+		}
+	}
+}
+
+species Landuse{
+	string type;
+	rgb color;
+	int dryness <- 500;
+	
+	reflex dry when: (dryness < 1000) {
+		dryness <- dryness + int(dryness_removal_amount/100);
+	}
+	
+	aspect base{
+	  if(showLanduse){
+	  	
+	  	if(showDryness){
+	  		draw shape color:(dryness>500) ? #red :#green  border:#black;
+	  	    //draw string(dryness) color:#white size:50;	
+	  	}else{
+	  		draw shape color:color border:#black;
+	  	}
+	  }	
+	}
+}
+
+//Server
 species Server skills: [network] parallel:true{
 	//receive message when detect message send from client 
 	reflex Receive when: has_more_message() {
@@ -148,26 +314,64 @@ species Server skills: [network] parallel:true{
 	}
 }
 
-species River{
-	aspect base{
-		draw (shape) color: #black;
-	}
-}
-
 grid Plot width: 8 height: 8{
 	string nameUnity;
 	
-	init{
-		one_of(Plot).color <- #green;
+	string type;
+	rgb color;
+	list<River> rivers_on_cell;
+	list<Landuse> landuse_on_cell <- [];
+	
+	init {
+		type<-one_of (cells_types);
+//		one_of(Plot).color <- #green; 
+	}
+	
+//	reflex cell_color{
+//		if(showGrid){
+//			if(type="Water"){
+//				draw shape color: color border: #white;	
+//			}else{
+//			  	draw shape color:cells_colors[type];	
+//			}	
+//		}
+//		if keystoning {
+//				draw 100.0 around(shape * 0.75) color: #black;
+//		}
+//	}
+	
+	action init_cell {
+		rivers_on_cell <- River overlapping self;
+	}
+
+	aspect base{
+//		one_of(Plot).color <- #green;
+//		draw shape;
+		
+		if(showGrid){
+			if(type="Water"){
+//				draw shape color: color border: #white;	
+				draw circle(3 #km) color: #blue;
+			}else{
+//				draw square( 3 #km) color: #red;
+			  	draw shape color:cells_colors[type];	
+			}	
+		}
+		if keystoning {
+				draw 100.0 around(shape * 0.75) color: #black;
+		}
 	}
 }
 
 experiment Run type: gui{
 	output{
-		display map{
-			species Gate aspect: default;
-			species River aspect: base;
-			grid Plot border: #black transparency:0.5;
+		display map  background:#black{
+			species MainRiver aspect: base;
+			species Gate aspect: base;
+			species River aspect: base transparency: 0.2;
+			species Water transparency: 0.2;
+			species Plot aspect: base transparency: 0.6;
+//			grid Plot border: #white transparency:0.5;
 		}
 	}
 }
