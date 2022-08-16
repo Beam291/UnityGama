@@ -113,19 +113,17 @@ global{
 		//old code
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
-				string cellLocation <- Plot[i,j].location;
-				string cellColor <- Plot[i,j].color;
-				Plot[i,j].nameUnity <- "Plot"+i+j;
+				string cellColor <-	cells_colors[Plot[i,j].type];
 				
-				write Plot[1,2].type;
+				Plot[i,j].nameUnity <- "Plot"+i+j;
 				
 				string cellID <- ""+i+j;
 				
-				add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;
-				
+				add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;	
 			}
 		}
 				
+		write gridDetail;
 		
 		loop i over: get_all_instances(Gate){
 			add i.location to: gateLocation;
@@ -147,13 +145,12 @@ global{
 		
 			loop i from: 0 to: 7{
 				loop j from: 0 to: 7{
-					string cellLocation <- Plot[i,j].location;
-					string cellColor <- Plot[i,j].color;
+					string cellColor <-	cells_colors[Plot[i,j].type];
 					
 					Plot[i,j].nameUnity <- "Plot"+i+j;
 					
 					string cellID <- ""+i+j;
-				
+					
 					add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;
 				
 				}
@@ -238,10 +235,6 @@ species River{
 	aspect base{
 	  draw shape color: is_closed? #red:rgb(235-235*sqrt(min([waterLevel,8])/8),235-235*sqrt(min([waterLevel,8])/8),255) width:3;		
 	}
-	
-//	aspect base{
-//		draw (shape) color: #black;
-//	}
 }
 
 species Water skills: [moving] {
@@ -324,36 +317,17 @@ grid Plot width: 8 height: 8{
 	
 	init {
 		type<-one_of (cells_types);
-//		one_of(Plot).color <- #green; 
 	}
-	
-//	reflex cell_color{
-//		if(showGrid){
-//			if(type="Water"){
-//				draw shape color: color border: #white;	
-//			}else{
-//			  	draw shape color:cells_colors[type];	
-//			}	
-//		}
-//		if keystoning {
-//				draw 100.0 around(shape * 0.75) color: #black;
-//		}
-//	}
 	
 	action init_cell {
 		rivers_on_cell <- River overlapping self;
 	}
 
 	aspect base{
-//		one_of(Plot).color <- #green;
-//		draw shape;
-		
 		if(showGrid){
 			if(type="Water"){
-//				draw shape color: color border: #white;	
 				draw circle(3 #km) color: #blue;
 			}else{
-//				draw square( 3 #km) color: #red;
 			  	draw shape color:cells_colors[type];	
 			}	
 		}

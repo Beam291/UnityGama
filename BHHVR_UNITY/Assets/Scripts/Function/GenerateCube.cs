@@ -150,9 +150,30 @@ public class GenerateCube : MonoBehaviour
                         {
                             string cellColor_string = cellDetail[1];
                             Color cellColor;
-                            ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
                             Renderer renderer = cube.GetComponent<Renderer>();
-                            renderer.material.color = cellColor;
+                            switch (cellColor_string)
+                            {
+                                case "orange":
+                                    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                                    renderer.material.color = cellColor;
+                                    break;
+                                case "darkgreen":
+                                    cellColor = new Color(0f / 255f, 100f / 255f, 0f / 255f);
+                                    renderer.material.color = cellColor;
+                                    break;
+                                case "lightgreen":
+                                    cellColor = new Color(0f, 255f / 255f, 0f);
+                                    renderer.material.color = cellColor;
+                                    break;
+                                case "red":
+                                    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                                    renderer.material.color = cellColor;
+                                    break;
+                                case "black":
+                                    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                                    renderer.material.color = cellColor;
+                                    break;
+                            }
                         }
                     }
                 }
