@@ -158,11 +158,11 @@ public class GenerateCube : MonoBehaviour
                                     renderer.material.color = cellColor;
                                     break;
                                 case "darkgreen":
-                                    cellColor = new Color(0f / 255f, 100f / 255f, 0f / 255f);
+                                    cellColor = new Color(1f / 255f, 50f / 255f, 32f / 255f);
                                     renderer.material.color = cellColor;
                                     break;
                                 case "lightgreen":
-                                    cellColor = new Color(0f, 255f / 255f, 0f);
+                                    cellColor = new Color(144f/255f, 238f / 255f, 144f/255f);
                                     renderer.material.color = cellColor;
                                     break;
                                 case "red":

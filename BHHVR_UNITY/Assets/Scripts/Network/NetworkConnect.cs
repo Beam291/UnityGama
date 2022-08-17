@@ -57,7 +57,7 @@ public class NetworkConnect : MonoBehaviour
         //Send the color have been selected to GAMA
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SendColorMessage();
+            SendTypeMessage();
         }
 	}
 
@@ -170,7 +170,7 @@ public class NetworkConnect : MonoBehaviour
 	}
 	
 	// Send the cube information which wants to change color
-	private void SendColorMessage()
+	private void SendTypeMessage()
 	{
 		if (socketConnection == null)
 		{
@@ -182,7 +182,7 @@ public class NetworkConnect : MonoBehaviour
 			NetworkStream stream = socketConnection.GetStream();
 			if (stream.CanWrite)
 			{
-				string clientMessage = cubeController.cubeName + '|' + cubeController.colorCube + "\n\r\n";
+				string clientMessage = cubeController.cubeName + '|' + cubeController.cubeType + "\n\r\n";
 
 				// Convert string message to byte array.                 
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);

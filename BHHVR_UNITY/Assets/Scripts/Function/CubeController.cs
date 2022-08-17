@@ -19,6 +19,11 @@ public class CubeController : MonoBehaviour
         get;
         set;
     }
+    internal string cubeType
+    {
+        get;
+        set;
+    }
     #endregion
 
     // Start is called before the first frame update
@@ -26,6 +31,9 @@ public class CubeController : MonoBehaviour
     {
         GenerateCubeReference();
         colorCube = "red";
+
+        //"Aquaculture", "Rice","Vegetables", "Industrial", "Null"
+        cubeType = "Aquaculture";
     }
 
     // Update is called once per frame

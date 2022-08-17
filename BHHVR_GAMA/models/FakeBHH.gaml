@@ -139,6 +139,7 @@ global{
         return spec.population +  spec.subspecies accumulate (get_all_instances(each));
     }
 	
+	//The list of grid will update new change if there is a change from Unity to GAMA 
 	reflex LiveGrid{
 		if(unityMessage = "Send_Detail"){
 			gridDetail <- [];
@@ -179,14 +180,16 @@ global{
 		point selectedCellCoordinate;
 		string selectedCellName;
 		string selectedCellColor;
+		string selectedCellType;
 		
 		selectedCellName <- selectedCell[0];
-		selectedCellColor <- selectedCell[1];
+//		selectedCellColor <- selectedCell[1];
+		selectedCellType <- selectedCell[1];
 		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
 				if(Plot[i,j].nameUnity = selectedCellName){
-					Plot[i,j].color <- selectedCellColor;
+					Plot[i,j].type <- selectedCellType;
 				}
 			}
 		}
