@@ -14,11 +14,6 @@ public class CubeController : MonoBehaviour
     internal string cubeZ;
 
     internal string cubeName;
-    internal string colorCube
-    {
-        get;
-        set;
-    }
     internal string cubeType
     {
         get;
@@ -30,7 +25,6 @@ public class CubeController : MonoBehaviour
     void Start()
     {
         GenerateCubeReference();
-        colorCube = "red";
 
         //"Aquaculture", "Rice","Vegetables", "Industrial", "Null"
         cubeType = "Aquaculture";

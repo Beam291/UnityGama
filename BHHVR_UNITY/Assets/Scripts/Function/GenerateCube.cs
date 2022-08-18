@@ -117,7 +117,7 @@ public class GenerateCube : MonoBehaviour
                 {
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube); // create new cube
 
-                    cube.transform.parent = GameObject.Find("MapTable").transform; // Find the map table
+                    cube.transform.parent = GameObject.Find("CubeManagement").transform; // Find the map table
 
                     cube.transform.position = new Vector3(i, j, mapPositionZ); //assign the position to concur with the grid in GAMA
 
@@ -151,6 +151,7 @@ public class GenerateCube : MonoBehaviour
                             string cellColor_string = cellDetail[1];
                             Color cellColor;
                             Renderer renderer = cube.GetComponent<Renderer>();
+                            //Each type of cell will be assign to a different color
                             switch (cellColor_string)
                             {
                                 case "orange":

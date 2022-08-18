@@ -78,6 +78,8 @@ global{
 			shape<-(simplification(shape,100));
 		}
 		
+		create Eye_candy from:river_flows_shape_file with: [type:: int(read('TYPE'))];
+		
 		ask Plot {
 			do init_cell;
 		}
@@ -88,10 +90,6 @@ global{
 		
 		the_river <- as_edge_graph(River);
 		probaEdges <- create_map(River as list,list_with(length(River),100.0));
-		
-		ask River {
-			overlapping_cell <- first(Plot overlapping self);
-		}
 		
 		ask Landuse {
 			if !empty(Plot overlapping self) {
@@ -120,6 +118,10 @@ global{
 				string cellID <- ""+i+j;
 				
 				add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;	
+				
+				ask Landuse overlapping Plot[i,j]{
+			     		self.color<-cells_colors[Plot[i,j].type];
+			    }
 			}
 		}
 				
@@ -131,6 +133,51 @@ global{
 		
 		if (type = "server") {
 			do CreateServer;
+		}
+	}
+	
+	reflex manage_water  {
+		ask River {
+			waterLevel <- 0;
+		}
+		ask Water {
+			River(self.current_edge).waterLevel <- River(self.current_edge).waterLevel+1;
+		}
+//		ask polluted_water {
+//			River(self.current_edge).waterLevel <- River(self.current_edge).waterLevel+1;
+//		}
+		probaEdges <- create_map(River as list, River collect(100/(1+each.waterLevel)));
+		ask River where each.is_closed{
+			put 0.001 at: self in: probaEdges;
+		}
+		ask source where(!each.is_closed){
+			create Water {
+				location <- myself.location;
+				color<-#blue;
+			}
+		}
+		ask dest {
+			do take_water;
+		}
+	}
+	
+	action mouse_click {
+		Gate selected_station <- first(Gate overlapping (circle(1) at_location #user_location));
+		if selected_station != nil{
+			selected_station.is_closed <- !selected_station.is_closed;
+			ask selected_station.controledRivers {
+				self.is_closed <- !(self.is_closed);
+			}
+		} else {
+			Plot selected_cell <- first(Plot overlapping (circle(1) at_location #user_location));
+			if selected_cell != nil{
+				int old_type <- index_of(cells_types, selected_cell.type);
+				selected_cell.type <- cells_types[mod(index_of(cells_types, selected_cell.type)+1,length(cells_types))];
+			}
+			//ask landuse overlapping selected_cell{
+			ask selected_cell.landuse_on_cell{
+			  self.color<-cells_colors[selected_cell.type];
+			}
 		}
 	}
 	
@@ -183,13 +230,16 @@ global{
 		string selectedCellType;
 		
 		selectedCellName <- selectedCell[0];
-//		selectedCellColor <- selectedCell[1];
 		selectedCellType <- selectedCell[1];
 		
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
 				if(Plot[i,j].nameUnity = selectedCellName){
 					Plot[i,j].type <- selectedCellType;
+					
+					ask Landuse overlapping Plot[i,j]{
+			     		self.color<-cells_colors[Plot[i,j].type];
+			    	}
 				}
 			}
 		}
@@ -227,6 +277,32 @@ species Gate {
 species MainRiver{
 	aspect base{
 		draw shape color:#blue width:2;
+	}
+}
+
+species polluted_water parent: Water {
+	rgb color <- #red;
+	string type;
+	
+	aspect default {
+		draw square(0.25#km)  color: cells_colors[type];	
+	}
+}
+
+species static_pollution{
+	rgb color;
+	float dissolution_expectancy;
+	
+	reflex remove_pollution{
+		dissolution_expectancy <- dissolution_expectancy - 10;
+		if dissolution_expectancy < 0 {
+			do die;
+		}
+		
+	}
+	
+	aspect{
+		draw square(0.2#km) color: color;
 	}
 }
 
@@ -291,6 +367,22 @@ species Landuse{
 	}
 }
 
+species Eye_candy{
+	int type;
+	
+	aspect base{
+		if mod(cycle,3) = mod(type,3){
+			draw shape color:#blue;
+		}
+		if mod(cycle-1,3) = mod(type,3){
+			draw shape color:rgb(50,50,255);
+		}
+		if mod(cycle-2,3) = mod(type,3){
+			draw shape color:rgb(100,100,255);
+		}
+	}
+}
+
 //Server
 species Server skills: [network] parallel:true{
 	//receive message when detect message send from client 
@@ -342,13 +434,78 @@ grid Plot width: 8 height: 8{
 
 experiment Run type: gui{
 	output{
-		display map  background:#black{
+		display map  background:#white axes: true{
+			species Landuse aspect:base transparency:0.65;
 			species MainRiver aspect: base;
 			species Gate aspect: base;
 			species River aspect: base transparency: 0.2;
 			species Water transparency: 0.2;
 			species Plot aspect: base transparency: 0.6;
 //			grid Plot border: #white transparency:0.5;
+
+			event mouse_down action:mouse_click;
+			event["g"] action: {showGrid<-!showGrid;};
+			event["l"] action: {showLegend<-!showLegend;};
+			event["w"] action: {showWater<-!showWater;};
+			
+//			graphics 'background'{
+//				draw shape color:#white at:{location.x,location.y,-10};
+//			}
+			
+			overlay position: { 180#px, 250#px } size: { 180 #px, 100 #px } background:#black transparency: 1 rounded: true
+            {   
+            	if(showLegend){
+// previous overlay, kept for rolling back
+//            		float x <- -70#px;
+//					float y <- -203#px;
+//	            	draw "CityScope Hanoi" at: { x, y } color: #white font: font("Helvetica", 32,#bold);
+//	            	draw "\nWater Management" at: { x, y } color: #white font: font("Helvetica", 20,#bold);
+//		            
+					float x <- -70#px;
+					float y <- -150#px;
+		            draw "CityScope" at: { x, y } color: #black font: font("Helvetica", 32,#bold);
+		            draw "\nHanoi" at: { x, y+35#px } color: #black font: font("Helvetica", 32,#bold);
+	            	draw "\n\nWater Management" at: { x, y + 70#px } color: #black font: font("Helvetica", 17,#bold);
+	            	
+	            	y <- 190#px;
+	            	draw "INTERACTION" at: { x,  y } color: #black font: font("Helvetica", 20,#bold);
+	            	y<-y+25#px;
+	            	draw "Landuse" at: { x,  y } color: #black font: font("Helvetica", 20,#bold);
+	            	y<-y+25#px;
+	            	
+	                loop type over: cells_types where (each != "Null")
+	                {
+//	                    draw square(20#px) at: { x + 10#px, y } color: #white;
+//						loop i from: 0 to: lego_code[type].rows - 1{
+//							loop j from: 0 to: lego_code[type].columns - 1{
+//								draw square(8#px) at: {x + (5+i*10)#px, y + (-5+j*10)#px} color: lego_code[type][i,j]=1?#black:#white;
+//							}
+//						}
+	                    draw square(20#px) at: { x, y } color: cells_colors[type] border: cells_colors[type]+1;
+	                    draw string(type) at: { x + 20#px, y + 7#px } color: #black font: font("Helvetica", 20,#bold);
+	                    y <- y + 25#px;
+	                }
+	                
+	                y <- y + 40#px;
+	                draw "Gate" at: { x + 0#px,  y+7#px } color: #black font: font("Helvetica", 20,#bold);
+	            	y <- y + 25#px;
+	                draw circle(10#px)-circle(5#px) at: { x + 20#px, y } color: #green border: #black;
+	                draw 'Open' at: { x + 40#px, y + 7#px } color: #black font: font("Helvetica", 20,#bold);
+	                y <- y + 25#px;
+	                draw circle(10#px)-circle(5#px) at: { x + 20#px, y } color: #red border: #black;
+	                draw 'Closed' at: { x + 40#px, y + 7#px } color: #black font: font("Helvetica", 20,#bold);
+	                y <- y + 25#px;
+	                draw circle(10#px)-circle(5#px) at: { x + 20#px, y } color: rgb(0,162,232) border: #black;
+	                draw 'Source' at: { x + 40#px, y + 7#px } color: #black font: font("Helvetica", 20,#bold);
+//	                y <- y + 25#px;
+//	                draw circle(10#px)-circle(5#px) at: { x + 20#px, y } color: #white border: #black;
+//	                draw 'Sink' at: { x + 40#px, y + 7#px } color: #white font: font("Helvetica", 20,#bold);
+	                y <- y + 25#px;
+//	                draw "Turn lego to open" at: { x + 0#px,  y+4#px } color: #white font: font("Helvetica", 20,#bold);
+//	            	draw "\nand close" at: { x + 0#px,  y+4#px } color: #white font: font("Helvetica", 20,#bold);
+	            
+            	}	
+            }
 		}
 	}
 }
