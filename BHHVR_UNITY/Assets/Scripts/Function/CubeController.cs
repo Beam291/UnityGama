@@ -27,6 +27,7 @@ public class CubeController : MonoBehaviour
         GenerateCubeReference();
 
         //"Aquaculture", "Rice","Vegetables", "Industrial", "Null"
+        //the default setting is always Aquaculture
         cubeType = "Aquaculture";
     }
 

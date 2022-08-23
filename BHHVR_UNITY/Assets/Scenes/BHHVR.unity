@@ -371,6 +371,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fc62f2aae4b8e9439be83a3f3352b0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &409085677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 409085678}
+  m_Layer: 0
+  m_Name: CubeManagement
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &409085678
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409085677}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1924210510}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410230861
 GameObject:
   m_ObjectHideFlags: 0
@@ -2130,7 +2161,6 @@ GameObject:
   - component: {fileID: 1924210509}
   - component: {fileID: 1924210508}
   - component: {fileID: 1924210507}
-  - component: {fileID: 1924210506}
   m_Layer: 0
   m_Name: MapTable
   m_TagString: Untagged
@@ -2138,18 +2168,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1924210506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1924210505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1c853b78a1b29e4abbc685cfba02d78, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &1924210507
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2221,10 +2239,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1924210505}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 35.22, y: 2.58, z: -7.56}
-  m_LocalScale: {x: 6.421299, y: 5.17121, z: 0.05}
+  m_LocalPosition: {x: 35.22, y: 2.9417934, z: -7.56}
+  m_LocalScale: {x: 7.484797, y: 5.8835874, z: 0.05}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 409085678}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -18,6 +18,8 @@ global{
 	graph the_river;
 	geometry shape <- envelope(main_rivers_shape_file);	
 	
+	graph shapeSong;
+	
 	list<string> cells_types <- ["Aquaculture", "Rice","Vegetables", "Industrial", "Null"];
 	
 	map<string, rgb> cells_colors <- [cells_types[0]::#orange, cells_types[1]::#darkgreen,cells_types[2]::#lightgreen, cells_types[3]::#red, cells_types[4]::#black];
@@ -60,11 +62,11 @@ global{
 	
 	list<string> cellColor;
 	
+	list<string> riverDetail;
+	
 	int cycle;
 	
 	list<string> gateLocation;
-	
-	map<string, int> testMap <- ['A'::0, 'B'::1];
 		
 	init{
 		//recreate
@@ -73,6 +75,12 @@ global{
 		}
 		
 		create River from: rivers_shape_file;
+		
+		loop r over: River {
+			write int(r);
+			add "<" + r + " ; " + r.location.x + " ; " to: riverDetail;
+		}
+		
 		create Gate from: gates_shape_file with: [type:: string(read('Type'))];
 		create Landuse from: landuse_shape_file with:[type::string(get("SIMPLE"))]{
 			shape<-(simplification(shape,100));
@@ -105,9 +113,6 @@ global{
 			controledRivers <- River overlapping (0.4#km around self.location);
 		}
 		
-		the_river <- as_edge_graph(River);
-		probaEdges <- create_map(River as list,list_with(length(River),100.0));
-		
 		//old code
 		loop i from: 0 to: 7{
 			loop j from: 0 to: 7{
@@ -125,12 +130,6 @@ global{
 			}
 		}
 				
-		write gridDetail;
-		
-		loop i over: get_all_instances(Gate){
-			add i.location to: gateLocation;
-		}
-		
 		if (type = "server") {
 			do CreateServer;
 		}
@@ -143,9 +142,9 @@ global{
 		ask Water {
 			River(self.current_edge).waterLevel <- River(self.current_edge).waterLevel+1;
 		}
-//		ask polluted_water {
-//			River(self.current_edge).waterLevel <- River(self.current_edge).waterLevel+1;
-//		}
+		ask polluted_water {
+			River(self.current_edge).waterLevel <- River(self.current_edge).waterLevel+1;
+		}
 		probaEdges <- create_map(River as list, River collect(100/(1+each.waterLevel)));
 		ask River where each.is_closed{
 			put 0.001 at: self in: probaEdges;
@@ -159,6 +158,43 @@ global{
 		ask dest {
 			do take_water;
 		}
+	}
+	
+	reflex water_consumption_and_pollution{
+		ask Water where(each.current_edge != nil) {
+			Plot c <- River(self.current_edge).overlapping_cell;
+			if flip(cells_withdrawal[ c.type] * 0.01){
+				ask c.landuse_on_cell {
+					 self.dryness <- max(self.dryness - dryness_removal_amount,0);	
+				}
+				if(flip(cells_pollution[ c.type] * 0.01)) {
+					create polluted_water {
+						location <- myself.location;
+						heading <- myself.heading;
+						type<-c.type;
+					}		
+				}	
+			do die;
+			}
+		}	
+		
+		ask polluted_water where(each.current_edge != nil) {
+			if flip(cells_withdrawal[ River(self.current_edge).overlapping_cell.type] * 0.01){
+				create static_pollution number: 8{
+					dissolution_expectancy<-StaticPollutionEvaporationAvgTime * (0.8 + rnd(0.4));
+					color <- myself.color;
+					location <- any_location_in(3#km around(myself.location));
+				}
+				if(flip(cells_pollution[ River(self.current_edge).overlapping_cell.type] * 0.01)) {
+					create polluted_water {
+						location <- myself.location;
+						heading <- myself.heading;
+						color <- cells_colors[River(myself.current_edge).overlapping_cell.type] ;
+					}		
+				}	
+			do die;
+			}
+		}	
 	}
 	
 	action mouse_click {
@@ -441,6 +477,8 @@ experiment Run type: gui{
 			species River aspect: base transparency: 0.2;
 			species Water transparency: 0.2;
 			species Plot aspect: base transparency: 0.6;
+			species polluted_water transparency: 0.2;
+			species static_pollution transparency: 0.5;
 //			grid Plot border: #white transparency:0.5;
 
 			event mouse_down action:mouse_click;
