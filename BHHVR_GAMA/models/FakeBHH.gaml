@@ -76,10 +76,21 @@ global{
 		
 		create River from: rivers_shape_file;
 		
-		loop r over: River {
-			write int(r);
-			add "<" + r + " ; " + r.location.x + " ; " to: riverDetail;
-		}
+//		loop r over: River {
+//			list<string> tempData;
+//			
+//			loop i from: 0 to: length(r.shape.points){
+////				write i;
+//				if(length(r.shape.points) = i){
+//					break;
+//				}
+//				add (r.shape.points[i]/10000) with_precision 2 to: tempData;
+//			}				
+//			
+//			add tempData to: riverDetail;
+//		}
+//		
+//		write riverDetail;
 		
 		create Gate from: gates_shape_file with: [type:: string(read('Type'))];
 		create Landuse from: landuse_shape_file with:[type::string(get("SIMPLE"))]{
@@ -129,7 +140,7 @@ global{
 			    }
 			}
 		}
-				
+		
 		if (type = "server") {
 			do CreateServer;
 		}
@@ -236,16 +247,18 @@ global{
 					string cellID <- ""+i+j;
 					
 					add "<" + cellID + " ; " + cellColor + " ; " + Plot[i,j].nameUnity + ">"  to: gridDetail;
-				
 				}
 			}
-			
 		}
 	}
 	
 	action CreateServer{
 		create Server{
 			do connect protocol: "tcp_server" port: 8052 raw: true;
+		}
+		
+		create Server1{
+			do connect protocol: "tcp_server" port: 8053 raw: true;
 		}
 	}
 	
@@ -434,6 +447,22 @@ species Server skills: [network] parallel:true{
 	reflex Send{
 		if(unityMessage = "Send_Detail") and (length(gridDetail) = 64){
 			do send to: client contents: gridDetail + '1' + gateLocation;
+		}
+	}
+}
+
+species Server1 skills: [network] parallel:true{
+	//receive message when detect message send from client 
+	reflex Receive when: has_more_message() {
+		loop while: has_more_message() {
+			message mm <- fetch_message();
+			client <- mm.sender;
+		}
+	}
+	
+	reflex Send{
+		if(unityMessage = "Send_Detail"){
+			do send to: client contents: riverDetail;
 		}
 	}
 }

@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GenerateCube : MonoBehaviour
 {
@@ -93,7 +92,7 @@ public class GenerateCube : MonoBehaviour
         cellHeight = mapScaleY / 8;
 
         //Cell Focal Point
-        cellFocalPointX = cellHeight/2;
+        cellFocalPointX = cellWidth/2;
         cellFocalPointY = cellHeight/2;
 
         //First cell - this is the first cell will foundation for others cell
@@ -125,7 +124,7 @@ public class GenerateCube : MonoBehaviour
                     
                     cube.gameObject.tag = "CubeController"; //add tag to each cube
 
-                    cube.transform.localScale = new Vector3(0.06f, 0.06f, 2f); // modify the scale of the cube
+                    cube.transform.localScale = new Vector3(0.1f, 0.1f, 2f); // modify the scale of the cube
                 }
             }
 
@@ -149,29 +148,45 @@ public class GenerateCube : MonoBehaviour
                         if (cubeID == cellDetail[0])
                         {
                             string cellColor_string = cellDetail[1];
-                            Color cellColor;
                             Renderer renderer = cube.GetComponent<Renderer>();
+                            Color cellColor = renderer.material.color;
+
+                            int minRenderQueue = -1;
+                            int maxRenderQueue = 5000;
+                            int defaultRenderQueue = -1;
+
+                            renderer.material.SetOverrideTag("RenderType", "Transparent");
+                            renderer.material.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.One);
+                            renderer.material.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                            renderer.material.SetFloat("_ZWrite", 2f);
+                            renderer.material.DisableKeyword("_ALPHATEST_ON");
+                            renderer.material.DisableKeyword("_ALPHABLEND_ON");
+                            renderer.material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                            //minRenderQueue = (int)UnityEngine.Rendering.RenderQueue.GeometryLast + 1;
+                            //maxRenderQueue = (int)UnityEngine.Rendering.RenderQueue.Overlay - 1;
+                            //defaultRenderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
                             //Each type of cell will be assign to a different color
                             switch (cellColor_string)
                             {
                                 case "orange":
-                                    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                                    cellColor = new Color(255f / 255f, 165f / 255f, 0f / 255f, 0.8f);
                                     renderer.material.color = cellColor;
                                     break;
                                 case "darkgreen":
-                                    cellColor = new Color(1f / 255f, 50f / 255f, 32f / 255f);
+                                    cellColor = new Color(1f / 255f, 50f / 255f, 32f / 255f, 0.8f);
                                     renderer.material.color = cellColor;
                                     break;
                                 case "lightgreen":
-                                    cellColor = new Color(144f/255f, 238f / 255f, 144f/255f);
+                                    cellColor = new Color(144f/255f, 238f / 255f, 144f/255f, 0.8f);
                                     renderer.material.color = cellColor;
                                     break;
                                 case "red":
-                                    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                                    cellColor = new Color(255f / 255f, 0f / 255f, 0f / 255f, 0.8f);
                                     renderer.material.color = cellColor;
                                     break;
                                 case "black":
-                                    ColorUtility.TryParseHtmlString(cellColor_string, out cellColor);
+                                    cellColor = new Color(0f / 255f, 0f / 255f, 0f / 255f, 0.8f);
                                     renderer.material.color = cellColor;
                                     break;
                             }

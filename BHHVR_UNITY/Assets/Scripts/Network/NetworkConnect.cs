@@ -205,5 +205,4 @@ public class NetworkConnect : MonoBehaviour
 			GameObject.Destroy(target);
 		}
 	}
-
 }
