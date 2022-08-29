@@ -521,13 +521,7 @@ experiment Run type: gui{
 			
 			overlay position: { 180#px, 250#px } size: { 180 #px, 100 #px } background:#black transparency: 1 rounded: true
             {   
-            	if(showLegend){
-// previous overlay, kept for rolling back
-//            		float x <- -70#px;
-//					float y <- -203#px;
-//	            	draw "CityScope Hanoi" at: { x, y } color: #white font: font("Helvetica", 32,#bold);
-//	            	draw "\nWater Management" at: { x, y } color: #white font: font("Helvetica", 20,#bold);
-//		            
+            	if(showLegend){     
 					float x <- -70#px;
 					float y <- -150#px;
 		            draw "CityScope" at: { x, y } color: #black font: font("Helvetica", 32,#bold);
@@ -542,12 +536,6 @@ experiment Run type: gui{
 	            	
 	                loop type over: cells_types where (each != "Null")
 	                {
-//	                    draw square(20#px) at: { x + 10#px, y } color: #white;
-//						loop i from: 0 to: lego_code[type].rows - 1{
-//							loop j from: 0 to: lego_code[type].columns - 1{
-//								draw square(8#px) at: {x + (5+i*10)#px, y + (-5+j*10)#px} color: lego_code[type][i,j]=1?#black:#white;
-//							}
-//						}
 	                    draw square(20#px) at: { x, y } color: cells_colors[type] border: cells_colors[type]+1;
 	                    draw string(type) at: { x + 20#px, y + 7#px } color: #black font: font("Helvetica", 20,#bold);
 	                    y <- y + 25#px;
@@ -564,12 +552,7 @@ experiment Run type: gui{
 	                y <- y + 25#px;
 	                draw circle(10#px)-circle(5#px) at: { x + 20#px, y } color: rgb(0,162,232) border: #black;
 	                draw 'Source' at: { x + 40#px, y + 7#px } color: #black font: font("Helvetica", 20,#bold);
-//	                y <- y + 25#px;
-//	                draw circle(10#px)-circle(5#px) at: { x + 20#px, y } color: #white border: #black;
-//	                draw 'Sink' at: { x + 40#px, y + 7#px } color: #white font: font("Helvetica", 20,#bold);
 	                y <- y + 25#px;
-//	                draw "Turn lego to open" at: { x + 0#px,  y+4#px } color: #white font: font("Helvetica", 20,#bold);
-//	            	draw "\nand close" at: { x + 0#px,  y+4#px } color: #white font: font("Helvetica", 20,#bold);
 	            
             	}	
             }
